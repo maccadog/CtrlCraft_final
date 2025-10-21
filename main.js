@@ -71,11 +71,7 @@ class CtrlCraftApp {
         }, 1000);
 
         // Auto-trigger scroll reveal animations for inquiry page
-        if (window.location.pathname.includes('inquiry.html')) {
-            setTimeout(() => {
-                this.triggerScrollAnimations();
-            }, 500);
-        }
+        // REMOVED: No auto-scrolling to allow natural user interaction
     }
 
     typewriterEffect(element, text, speed = 50) {
@@ -145,21 +141,20 @@ class CtrlCraftApp {
     }
 
     setupFormHandlers() {
-        // Service selection functionality
-        const serviceOptions = document.querySelectorAll('.service-option');
+    // Service selection ONLY – leave controller cards alone
+        const serviceOptions = document.querySelectorAll('.service-option[data-service]');
         const selectedServiceInput = document.getElementById('selected-service');
-        
+
         serviceOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                serviceOptions.forEach(opt => opt.classList.remove('selected'));
-                option.classList.add('selected');
-                
-                if (selectedServiceInput) {
-                    const service = option.getAttribute('data-service');
-                    selectedServiceInput.value = service;
-                }
-            });
+        option.addEventListener('click', () => {
+            serviceOptions.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+
+            if (selectedServiceInput) {
+                selectedServiceInput.value = option.dataset.service;
+            }
         });
+    });
     }
 
     initCarousels() {

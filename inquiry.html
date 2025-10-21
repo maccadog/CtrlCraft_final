@@ -56,6 +56,34 @@
             border-color: #14b8a6;
             background: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(59, 130, 246, 0.1));
         }
+        .color-option {
+            background: linear-gradient(135deg, rgba(45, 45, 45, 0.9), rgba(26, 26, 26, 0.9));
+            border: 2px solid rgba(75, 85, 99, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .color-option:hover {
+            border-color: rgba(20, 184, 166, 0.5);
+            transform: translateY(-2px);
+        }
+        .color-option.selected {
+            border-color: #14b8a6;
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(59, 130, 246, 0.1));
+        }
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            margin: 0 auto 8px;
+            transition: all 0.3s ease;
+        }
+        .color-option:hover .color-preview {
+            transform: scale(1.1);
+            border-color: rgba(20, 184, 166, 0.8);
+        }
         .file-upload {
             border: 2px dashed rgba(75, 85, 99, 0.5);
             transition: all 0.3s ease;
@@ -88,6 +116,7 @@
             border: 1px solid rgba(75, 85, 99, 0.3);
             transition: all 0.3s ease;
         }
+        
         .preview-item:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(20, 184, 166, 0.2);
@@ -98,140 +127,39 @@
             object-fit: cover;
             transition: transform 0.3s ease;
         }
-        .preview-item:hover img {
-            transform: scale(1.05);
+        .color-options-container {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
         }
-        .preview-item .file-info {
-            padding: 0.5rem;
-            font-size: 0.75rem;
+        .color-options-container.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
-        .preview-item .remove-btn {
-            position: absolute;
-            top: 0.25rem;
-            right: 0.25rem;
-            background: rgba(239, 68, 68, 0.8);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.875rem;
-            transition: all 0.3s ease;
+        .metallic-finish {
+            background: linear-gradient(45deg, #c0c0c0, #ffffff, #c0c0c0);
+            position: relative;
         }
-        .preview-item .remove-btn:hover {
-            background: rgba(239, 68, 68, 1);
-            transform: scale(1.1);
-        }
-        .phone-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        /* Dust Animation Styles */
-        #particle-canvas {
+        .metallic-finish::after {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
-            pointer-events: none;
-            z-index: 1;
-        }
-        .hero-section {
-            position: relative;
-            overflow: hidden;
-        }
-        .content-layer {
-            position: relative;
-            z-index: 2;
-        }
-        /* Enhanced Upload Styles */
-        .upload-info {
-            margin-top: 0.5rem;
-            font-size: 0.75rem;
-            color: #9ca3af;
-        }
-        .upload-progress {
-            margin-top: 0.5rem;
-            height: 2px;
-            background: rgba(75, 85, 99, 0.3);
-            border-radius: 1px;
-            overflow: hidden;
-        }
-        .upload-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #14b8a6, #3b82f6);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        /* Drag and Drop Styles */
-        .file-upload.drag-over {
-            border-color: #14b8a6 !important;
-            background: rgba(20, 184, 166, 0.1) !important;
-            transform: scale(1.02);
-        }
-        /* Animation Enhancements */
-        .floating-element {
-            animation: subtleFloat 6s ease-in-out infinite;
-        }
-        @keyframes subtleFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        .service-option::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.1), transparent);
-            transition: left 0.5s ease;
-        }
-        .service-option:hover::before {
-            left: 100%;
-        }
-        /* Form Enhancements */
-        .form-input:hover {
-            border-color: rgba(20, 184, 166, 0.3);
-        }
-        .form-input:focus:hover {
-            border-color: #14b8a6;
-        }
-        /* Button Enhancements */
-        button, .btn {
-            position: relative;
-            overflow: hidden;
-        }
-        button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.2);
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
             border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
         }
-        button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-        /* Image Counter */
-        .image-counter {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(20, 184, 166, 0.9);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
+        .price-tag {
+            background: rgba(20, 184, 166, 0.2);
+            border: 1px solid #14b8a6;
+            border-radius: 12px;
+            padding: 4px 8px;
+            font-size: 12px;
             font-weight: bold;
+            color: #14b8a6;
         }
     </style>
 </head>
@@ -250,159 +178,261 @@
                     <div class="ml-10 flex items-baseline space-x-8">
                         <a href="index.html" class="text-gray-300 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">Home</a>
                         <a href="about.html" class="text-gray-300 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">About</a>
-                        <a href="inquiry.html" class="text-teal-400 px-3 py-2 text-sm font-medium">Inquiry</a>
+                        <a href="inquiry.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Inquiry</a>
                     </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section with Dust Animation -->
-    <section class="hero-section pt-24 pb-12 bg-gradient-to-br from-gray-900 via-black to-gray-900">
-        <canvas id="particle-canvas"></canvas>
-        <div class="content-layer max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 id="hero-title" class="orbitron text-4xl md:text-6xl font-black mb-6 metallic-text"></h1>
-            <p class="text-xl text-gray-300 max-w-2xl mx-auto">
-                Tell us about your dream controller and we'll bring it to life with our precision craftsmanship
+    <!-- Hero Section -->
+    <section class="pt-24 pb-12 bg-gradient-to-br from-black via-gray-900 to-black">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="orbitron text-5xl font-bold mb-6 metallic-text scroll-reveal">
+                Custom Controller Inquiry
+            </h1>
+            <p class="text-xl text-gray-300 mb-8 scroll-reveal">
+                Transform your gaming experience with our premium custom controllers
             </p>
         </div>
     </section>
 
     <!-- Inquiry Form -->
-    <section class="py-20 bg-black">
+    <section class="py-16 bg-gray-900">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="form-container rounded-2xl p-8 md:p-12 scroll-reveal floating-element">
+            <div class="form-container rounded-2xl p-8 scroll-reveal">
                 <form id="inquiry-form" class="space-y-8">
-                    <!-- Service Selection -->
-                    <div>
-                        <h3 class="orbitron text-2xl font-bold mb-6 text-center">Choose Your Service</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="service-option p-6 rounded-xl" data-service="custom-painting">
-                                <div class="text-4xl mb-4 text-center">🎨</div>
-                                <h4 class="orbitron text-lg font-bold mb-2 text-center">Custom Painting</h4>
-                                <p class="text-sm text-gray-400 text-center">Automotive-grade paints & professional finish</p>
-                            </div>
-                            <div class="service-option p-6 rounded-xl" data-service="vacuum-metallizing">
-                                <div class="text-4xl mb-4 text-center">✨</div>
-                                <h4 class="orbitron text-lg font-bold mb-2 text-center">Vacuum Metallizing</h4>
-                                <p class="text-sm text-gray-400 text-center">Mirror-like metallic finishes</p>
-                            </div>
-                            <div class="service-option p-6 rounded-xl" data-service="pvd-coating">
-                                <div class="text-4xl mb-4 text-center">🔬</div>
-                                <h4 class="orbitron text-lg font-bold mb-2 text-center">PVD Coating</h4>
-                                <p class="text-sm text-gray-400 text-center">Extreme durability & unique effects</p>
-                            </div>
-                        </div>
-                        <input type="hidden" id="selected-service" name="service" required>
-                    </div>
-
                     <!-- Personal Information -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Full Name *</label>
-                            <input type="text" id="name" name="name" required 
+                            <label for="first-name" class="block text-sm font-medium text-gray-300 mb-2">First Name *</label>
+                            <input type="text" id="first-name" name="first_name" required 
                                    class="form-input w-full px-4 py-3 rounded-lg" 
-                                   placeholder="Your full name">
+                                   placeholder="Enter your first name">
                         </div>
+                        <div>
+                            <label for="last-name" class="block text-sm font-medium text-gray-300 mb-2">Last Name *</label>
+                            <input type="text" id="last-name" name="last_name" required 
+                                   class="form-input w-full px-4 py-3 rounded-lg" 
+                                   placeholder="Enter your last name">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email Address *</label>
                             <input type="email" id="email" name="email" required 
                                    class="form-input w-full px-4 py-3 rounded-lg" 
                                    placeholder="your.email@example.com">
                         </div>
-                    </div>
-
-                    <!-- Phone Number - Centered -->
-                    <div class="phone-center">
-                        <div class="w-full md:w-1/2">
+                        <div>
                             <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
                             <input type="tel" id="phone" name="phone" 
                                    class="form-input w-full px-4 py-3 rounded-lg" 
-                                   placeholder="Your phone number (optional)">
+                                   placeholder="(555) 123-4567">
                         </div>
                     </div>
 
-                    <!-- Controller Details -->
+                    <!-- Controller Type -->
                     <div>
-                        <label for="controller-type" class="block text-sm font-medium text-gray-300 mb-2">Controller Type</label>
-                        <select id="controller-type" name="controller-type" 
-                                class="form-input w-full px-4 py-3 rounded-lg">
-                            <option value="">Select controller type</option>
-                            <option value="xbox-series-x">Xbox Series X/S</option>
-                            <option value="xbox-one">Xbox One</option>
-                            <option value="ps5">PlayStation 5</option>
-                            <option value="ps4">PlayStation 4</option>
-                            <option value="nintendo-switch">Nintendo Switch Pro</option>
-                            <option value="other">Other</option>
-                        </select>
+                        <label class="block text-sm font-medium text-gray-300 mb-4">Controller Type *</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="service-option p-4 rounded-lg text-center" data-controller="playstation">
+                                <div class="text-2xl mb-2">🎮</div>
+                                <div class="font-medium">PlayStation</div>
+                                <div class="text-xs text-gray-400">PS4/PS5 Controllers</div>
+                            </div>
+                            <div class="service-option p-4 rounded-lg text-center" data-controller="xbox">
+                                <div class="text-2xl mb-2">🎯</div>
+                                <div class="font-medium">Xbox</div>
+                                <div class="text-xs text-gray-400">Xbox One/Series</div>
+                            </div>
+                            <div class="service-option p-4 rounded-lg text-center" data-controller="nintendo">
+                                <div class="text-2xl mb-2">🕹️</div>
+                                <div class="font-medium">Nintendo</div>
+                                <div class="text-xs text-gray-400">Switch Pro/Joy-Con</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selected-controller" name="controller_type" required>
+                    </div>
+
+                    <!-- Service Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-4">Service Type *</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="service-option p-4 rounded-lg text-center" data-service="custom-painting">
+                                <div class="text-2xl mb-2">🎨</div>
+                                <div class="font-medium">Custom Painting</div>
+                                <div class="text-xs text-gray-400 mb-2">Premium paint finishes</div>
+                                <div class="price-tag">EST $25</div>
+                            </div>
+                            <div class="service-option p-4 rounded-lg text-center" data-service="vacuum-metallizing">
+                                <div class="text-2xl mb-2">✨</div>
+                                <div class="font-medium">Vacuum Metallizing</div>
+                                <div class="text-xs text-gray-400 mb-2">Metallic coatings</div>
+                                <div class="price-tag">EST $40</div>
+                            </div>
+                            <div class="service-option p-4 rounded-lg text-center" data-service="custom-design">
+                                <div class="text-2xl mb-2">🎭</div>
+                                <div class="font-medium">Custom Design</div>
+                                <div class="text-xs text-gray-400 mb-2">Unique artwork</div>
+                                <div class="price-tag">EST $60</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selected-service" name="service_type" required>
+                    </div>
+
+                    <!-- Color Options for Custom Painting -->
+                    <div id="painting-colors" class="color-options-container">
+                        <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Paint Color</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Crimson Red">
+                                <div class="color-preview" style="background: #dc143c;"></div>
+                                <div class="text-xs font-medium">Crimson Red</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Deep Blue">
+                                <div class="color-preview" style="background: #00008b;"></div>
+                                <div class="text-xs font-medium">Deep Blue</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Forest Green">
+                                <div class="color-preview" style="background: #228b22;"></div>
+                                <div class="text-xs font-medium">Forest Green</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Sunset Orange">
+                                <div class="color-preview" style="background: #ff6347;"></div>
+                                <div class="text-xs font-medium">Sunset Orange</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Royal Purple">
+                                <div class="color-preview" style="background: #663399;"></div>
+                                <div class="text-xs font-medium">Royal Purple</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Midnight Black">
+                                <div class="color-preview" style="background: #000000;"></div>
+                                <div class="text-xs font-medium">Midnight Black</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Arctic White">
+                                <div class="color-preview" style="background: #f8f8ff;"></div>
+                                <div class="text-xs font-medium">Arctic White</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Electric Pink">
+                                <div class="color-preview" style="background: #ff1493;"></div>
+                                <div class="text-xs font-medium">Electric Pink</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Titanium Gray">
+                                <div class="color-preview" style="background: #708090;"></div>
+                                <div class="text-xs font-medium">Titanium Gray</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Gold Rush">
+                                <div class="color-preview" style="background: #ffd700;"></div>
+                                <div class="text-xs font-medium">Gold Rush</div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label for="custom-paint-color" class="block text-sm font-medium text-gray-300 mb-2">Custom Color (Optional)</label>
+                            <input type="text" id="custom-paint-color" name="custom_paint_color" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" 
+                                   placeholder="Describe your custom color...">
+                        </div>
+                        <input type="hidden" id="selected-paint-color" name="selected_paint_color">
+                    </div>
+
+                    <!-- Metallic Color Options for Vacuum Metalizing -->
+                    <div id="metallizing-colors" class="color-options-container">
+                        <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Metallic Finish</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Chrome Silver">
+                                <div class="color-preview metallic-finish" style="background: linear-gradient(45deg, #c0c0c0, #ffffff, #c0c0c0);"></div>
+                                <div class="text-xs font-medium">Chrome Silver</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Gold Mirror">
+                                <div class="color-preview metallic-finish" style="background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);"></div>
+                                <div class="text-xs font-medium">Gold Mirror</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Rose Gold">
+                                <div class="color-preview metallic-finish" style="background: linear-gradient(45deg, #e0b4c4, #f4c2c2, #e0b4c4);"></div>
+                                <div class="text-xs font-medium">Rose Gold</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Copper Bronze">
+                                <div class="color-preview metallic-finish" style="background: linear-gradient(45deg, #b87333, #cd7f32, #b87333);"></div>
+                                <div class="text-xs font-medium">Copper Bronze</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Titanium Blue">
+                                <div class="color-preview metallic-finish" style="background: linear-gradient(45deg, #4682b4, #87ceeb, #4682b4);"></div>
+                                <div class="text-xs font-medium">Titanium Blue</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Platinum White">
+                                <div class="color-preview metallic-finish" style="background: linear-gradient(45deg, #e5e4e2, #ffffff, #e5e4e2);"></div>
+                                <div class="text-xs font-medium">Platinum White</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Black Nickel">
+                                <div class="color-preview metallic-finish" style="background: linear-gradient(45deg, #36454f, #708090, #36454f);"></div>
+                                <div class="text-xs font-medium">Black Nickel</div>
+                            </div>
+                            <div class="color-option p-3 rounded-lg text-center" data-color="Purple Haze">
+                                <div class="color-preview metallic-finish" style="background: linear-gradient(45deg, #663399, #da70d6, #663399);"></div>
+                                <div class="text-xs font-medium">Purple Haze</div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label for="custom-metallic-color" class="block text-sm font-medium text-gray-300 mb-2">Custom Metallic Finish (Optional)</label>
+                            <input type="text" id="custom-metallic-color" name="custom_metallic_color" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" 
+                                   placeholder="Describe your custom metallic finish...">
+                        </div>
+                        <input type="hidden" id="selected-metallic-color" name="selected_metallic_color">
                     </div>
 
                     <!-- Design Details -->
                     <div>
-                        <label for="message" class="block text-sm font-medium text-gray-300 mb-2">Design Details *</label>
-                        <textarea id="message" name="message" rows="6" required 
-                                  class="form-input w-full px-4 py-3 rounded-lg resize-none" 
-                                  placeholder="Describe your dream controller design, colors, patterns, themes, or any specific requirements..."></textarea>
+                        <label for="design-description" class="block text-sm font-medium text-gray-300 mb-2">Design Description *</label>
+                        <textarea id="design-description" name="design_description" rows="4" required
+                                  class="form-input w-full px-4 py-3 rounded-lg" 
+                                  placeholder="Describe your vision, style preferences, specific details, or any special requests..."></textarea>
                     </div>
 
-                    <!-- File Upload -->
-                    <div class="relative">
-                        <label class="block text-sm font-medium text-gray-300 mb-2">Reference Images (Optional)</label>
-                        <div class="file-upload rounded-lg p-6 text-center">
-                            <input type="file" id="inspiration-upload" name="inspiration" multiple 
-                                   accept="image/*" class="hidden">
-                            <button type="button" onclick="document.getElementById('inspiration-upload').click()" 
-                                    class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg transition-all transform hover:scale-105">
-                                Choose Files or Drag & Drop
-                            </button>
-                            <p class="text-sm text-gray-400 mt-2">Upload inspiration images or reference photos</p>
-                            <div class="upload-info">
-                                Max 10 images, 10MB each. Supports JPG, PNG, GIF
-                            </div>
-                            <div id="image-preview" class="image-preview mt-4">
-                                <p class="text-gray-400 text-sm text-center">No files selected</p>
-                            </div>
+                    <!-- Inspiration Images -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Inspiration Images</label>
+                        <div class="file-upload p-8 rounded-lg text-center">
+                            <div class="text-4xl mb-4">📸</div>
+                            <p class="text-gray-400 mb-2">Drag and drop images here or click to browse</p>
+                            <p class="text-xs text-gray-500">Supports JPG, PNG up to 10MB each</p>
+                            <input type="file" id="inspiration-upload" multiple accept="image/*" class="hidden">
                         </div>
-                        <div id="image-counter" class="image-counter" style="display: none;">
-                            0/10
-                        </div>
+                        <div id="image-preview" class="image-preview"></div>
                     </div>
 
                     <!-- Timeline -->
                     <div>
                         <label for="timeline" class="block text-sm font-medium text-gray-300 mb-2">Desired Timeline</label>
-                        <select id="timeline" name="timeline" 
-                                class="form-input w-full px-4 py-3 rounded-lg">
+                        <select id="timeline" name="timeline" class="form-input w-full px-4 py-3 rounded-lg">
                             <option value="">Select timeline</option>
-                            <option value="1-2-weeks">1-2 weeks (Normal timing - no additional cost)</option>
-                            <option value="asap">ASAP (Rush order + additional cost)</option>
+                            <option value="1-2weeks">1-2 weeks (No additional charge)</option>
+                            <option value="asap">ASAP (Additional fees apply)</option>
                         </select>
                     </div>
 
-                    <!-- Shipping Notice -->
-                    <div class="bg-gray-800 border border-teal-600 rounded-lg p-6">
-                        <h3 class="orbitron text-lg font-bold mb-4 text-teal-400">📍 Shipping Information</h3>
-                        <p class="text-gray-300 mb-4">
-                            All controllers must be shipped or delivered to our workshop location. Please confirm you understand this requirement.
-                        </p>
-                        <div class="bg-teal-900 bg-opacity-30 border border-teal-500 rounded-lg p-4 mb-4">
-                            <p class="font-bold text-teal-300">40 Ben Lomond Crest, Pakuranga, Auckland</p>
-                            <p class="text-sm text-gray-400 mt-1">⚠️ At customer's expense</p>
-                        </div>
-                        <div class="flex items-start">
-                            <input type="checkbox" id="shipping-confirm" name="shipping-confirm" required 
-                                   class="mt-1 mr-3 h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
-                            <label for="shipping-confirm" class="text-sm text-gray-300">
-                                I understand and agree that controllers must be shipped or delivered to 40 Ben Lomond Crest, Pakuranga, Auckland at my own expense. *
-                            </label>
-                        </div>
+                    <!-- Additional Notes -->
+                    <div>
+                        <label for="additional-notes" class="block text-sm font-medium text-gray-300 mb-2">Additional Notes</label>
+                        <textarea id="additional-notes" name="additional_notes" rows="3"
+                                  class="form-input w-full px-4 py-3 rounded-lg" 
+                                  placeholder="Any additional information, special requirements, or questions..."></textarea>
                     </div>
 
                     <!-- Submit Button -->
                     <div class="text-center">
-                        <button type="submit" 
-                                class="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105">
-                            Send Inquiry
+                        <button type="submit" id="submit-btn" 
+                                class="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span id="submit-text">Send Inquiry</span>
+                            <span id="submit-loading" class="hidden">Sending...</span>
                         </button>
                     </div>
                 </form>
@@ -411,16 +441,119 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 border-t border-gray-800 py-8">
+    <footer class="bg-black py-12 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p class="text-gray-400">&copy; 2024 CtrlCraft. Precision Gaming, Perfected.</p>
+            <div class="flex items-center justify-center mb-4">
+                <img src="ctrlcraft.png" alt="CtrlCraft Logo" class="h-8 w-8 mr-2">
+                <span class="orbitron text-xl font-bold metallic-text">CtrlCraft</span>
+            </div>
+            <p class="text-gray-400 text-sm">
+                © 2024 CtrlCraft. Precision Gaming, Perfected.
+            </p>
         </div>
     </footer>
 
-    <!-- Email Handler Script -->
-    <script src="email-handler-fixed.js"></script>
-    
-    <!-- Main JavaScript -->
+    <!-- Scripts -->
+    <script src="https://cdn.emailjs.com/sdk/v3/email.min.js"></script>
     <script src="main.js"></script>
+    <script src="email-handler-fixed.js"></script>
+    <script>
+        // Initialize color selection functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const controllerOptions = document.querySelectorAll('.service-option[data-controller]');
+            const serviceOptions = document.querySelectorAll('.service-option[data-service]');
+            const paintingColors = document.getElementById('painting-colors');
+            const metallizingColors = document.getElementById('metallizing-colors');
+            const selectedControllerInput = document.getElementById('selected-controller');
+            const selectedServiceInput = document.getElementById('selected-service');
+
+            // Color selection handlers
+            function setupColorSelection() {
+                const colorOptions = document.querySelectorAll('.color-option');
+                const selectedPaintColor = document.getElementById('selected-paint-color');
+                const selectedMetallicColor = document.getElementById('selected-metallic-color');
+
+                colorOptions.forEach(option => {
+                    option.addEventListener('click', () => {
+                        const container = option.closest('.color-options-container');
+                        const options = container.querySelectorAll('.color-option');
+                        
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        option.classList.add('selected');
+                        
+                        const color = option.getAttribute('data-color');
+                        if (container.id === 'painting-colors') {
+                            selectedPaintColor.value = color;
+                        } else if (container.id === 'metallizing-colors') {
+                            selectedMetallicColor.value = color;
+                        }
+                    });
+                });
+            }
+
+           /* ----------  NEW UNIFIED CLICK HANDLER (controller + service)  ---------- */
+            document.querySelectorAll('.service-option').forEach(option => {
+            option.addEventListener('click', function () {
+                const isController = this.hasAttribute('data-controller');
+                const isService  = this.hasAttribute('data-service');
+
+                if (isController) {
+                // keep only one controller highlighted
+                document.querySelectorAll('[data-controller]').forEach(el => el.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('selected-controller').value = this.dataset.controller;
+                }
+
+                if (isService) {
+                // keep only one service highlighted
+                document.querySelectorAll('[data-service]').forEach(el => el.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('selected-service').value = this.dataset.service;
+
+                /* ----- colour-section toggle (your existing logic) ----- */
+                const paintingColors   = document.getElementById('painting-colors');
+                const metallizingColors = document.getElementById('metallizing-colors');
+                paintingColors.classList.remove('active');
+                metallizingColors.classList.remove('active');
+
+                setTimeout(() => {
+                    if (this.dataset.service === 'custom-painting')      paintingColors.classList.add('active');
+                    if (this.dataset.service === 'vacuum-metallizing')  metallizingColors.classList.add('active');
+                }, 100);
+                }
+            });
+            });
+
+            // Setup color selection
+            setupColorSelection();
+
+            // Form submission handler for color data
+            const form = document.getElementById('inquiry-form');
+            form.addEventListener('submit', function(e) {
+                const service = selectedServiceInput.value;
+                let colorData = '';
+
+                if (service === 'custom-painting') {
+                    const selectedColor = document.getElementById('selected-paint-color').value;
+                    const customColor = document.getElementById('custom-paint-color').value;
+                    colorData = selectedColor || customColor || 'Not specified';
+                } else if (service === 'vacuum-metallizing') {
+                    const selectedColor = document.getElementById('selected-metallic-color').value;
+                    const customColor = document.getElementById('custom-metallic-color').value;
+                    colorData = selectedColor || customColor || 'Not specified';
+                }
+
+                // Add color data to form submission
+                if (colorData) {
+                    const colorInput = document.createElement('input');
+                    colorInput.type = 'hidden';
+                    colorInput.name = 'color_choice';
+                    colorInput.value = colorData;
+                    form.appendChild(colorInput);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
