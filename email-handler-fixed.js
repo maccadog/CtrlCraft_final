@@ -217,7 +217,7 @@ class EmailHandler {
                 controller_type: data['controller-type'] || 'Not specified',
                 timeline: data.timeline || 'Not specified',
                 message: data.message.trim(),
-                image_html: imageHtml,
+                image_html: data.imageHtml,
                 reply_to: data.email.trim()
             };
             
