@@ -50,7 +50,10 @@ class CtrlCraftApp {
         // Typewriter effect for hero text
         const heroTitle = document.getElementById('hero-title');
         if (heroTitle) {
-            this.typewriterEffect(heroTitle, 'Precision Gaming, Perfected');
+            // Set default text for inquiry page if not set
+            if (!heroTitle.textContent.trim()) {
+                this.typewriterEffect(heroTitle, 'Precision Gaming, Perfected');
+            }
         } else {
             console.warn('Hero title element not found!');
         }
@@ -98,22 +101,25 @@ class CtrlCraftApp {
                 duration: 800
             });
         } else {
-            console.warn('Anime.js not loaded — using fallback CSS animation');
+            // Fallback animation
             cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                card.style.transition = 'all 0.6s ease';
-                
                 setTimeout(() => {
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
-                }, index * 200);
+                }, index * 150);
             });
         }
     }
 
-    handleScrollAnimations() {
+    triggerScrollAnimations() {
         const elements = document.querySelectorAll('.scroll-reveal');
+        elements.forEach(element => {
+            element.classList.add('active');
+        });
+    }
+
+    handleScrollAnimations() {
+        const elements = document.querySelectorAll('.scroll-reveal:not(.active)');
         elements.forEach(element => {
             const elementTop = element.getBoundingClientRect().top;
             const elementVisible = 150;
@@ -124,143 +130,26 @@ class CtrlCraftApp {
         });
     }
 
-    // New method to trigger animations without scroll
-    triggerScrollAnimations() {
-        const elements = document.querySelectorAll('.scroll-reveal');
-        elements.forEach((element, index) => {
-            setTimeout(() => {
-                element.classList.add('active');
-            }, index * 100);
-        });
-    }
-
     setupFormHandlers() {
-        const inquiryForm = document.getElementById('inquiry-form');
-        if (inquiryForm) {
-            inquiryForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleInquirySubmission(e.target);
-            });
-        }
-
-        // Service selection
-        const serviceCards = document.querySelectorAll('.service-option');
-        serviceCards.forEach(card => {
-            card.addEventListener('click', () => {
-                this.selectService(card);
-            });
-        });
-
-        // File upload handling
-        const fileInput = document.getElementById('inspiration-upload');
-        if (fileInput) {
-            fileInput.addEventListener('change', (e) => {
-                this.handleFileUpload(e.target);
-            });
-        }
-    }
-
-    selectService(selectedCard) {
-        // Remove previous selections
-        document.querySelectorAll('.service-option').forEach(card => {
-            card.classList.remove('selected');
-        });
+        // Service selection functionality
+        const serviceOptions = document.querySelectorAll('.service-option');
+        const selectedServiceInput = document.getElementById('selected-service');
         
-        // Add selection to clicked card
-        selectedCard.classList.add('selected');
-        
-        // Update hidden form field
-        const serviceInput = document.getElementById('selected-service');
-        if (serviceInput) {
-            serviceInput.value = selectedCard.dataset.service;
-        }
-    }
-
-    handleFileUpload(input) {
-        const imagePreview = document.getElementById('image-preview');
-        if (imagePreview && input.files.length > 0) {
-            imagePreview.innerHTML = '';
-            
-            // Create a Set to track unique files by name and size
-            const uniqueFiles = new Map();
-            
-            Array.from(input.files).forEach((file, index) => {
-                if (file.type.startsWith('image/')) {
-                    const fileKey = `${file.name}-${file.size}`;
-                    
-                    // Only process if this file combination is not already seen
-                    if (!uniqueFiles.has(fileKey)) {
-                        uniqueFiles.set(fileKey, file);
-                        
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            this.createImagePreview(file, e.target.result, index);
-                        };
-                        reader.readAsDataURL(file);
-                    }
+        serviceOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove selected class from all options
+                serviceOptions.forEach(opt => opt.classList.remove('selected'));
+                
+                // Add selected class to clicked option
+                option.classList.add('selected');
+                
+                // Set the hidden input value
+                if (selectedServiceInput) {
+                    const service = option.getAttribute('data-service');
+                    selectedServiceInput.value = service;
                 }
             });
-        } else if (imagePreview) {
-            imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
-        }
-    }
-
-    createImagePreview(file, imageData, index) {
-        const imagePreview = document.getElementById('image-preview');
-        
-        const previewItem = document.createElement('div');
-        previewItem.className = 'preview-item';
-        previewItem.innerHTML = `
-            <img src="${imageData}" alt="${file.name}">
-            <div class="file-info">
-                <div class="text-white text-xs truncate">${file.name}</div>
-                <div class="text-gray-400 text-xs">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
-            </div>
-            <button type="button" class="remove-btn" onclick="this.parentElement.remove(); checkEmptyPreview();">×</button>
-        `;
-        
-        imagePreview.appendChild(previewItem);
-    }
-
-    async handleInquirySubmission(form) {
-        const formData = new FormData(form);
-        const submitBtn = form.querySelector('button[type="submit"]');
-        
-        // Show loading state
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
-        
-        try {
-            // Simulate form submission (replace with actual endpoint)
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Show success message
-            this.showNotification('Inquiry sent successfully! We\'ll contact you soon.', 'success');
-            
-            // Reset form
-            form.reset();
-            
-            // Reset service selection
-            document.querySelectorAll('.service-option').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            // Reset file upload display
-            const imagePreview = document.getElementById('image-preview');
-            if (imagePreview) {
-                imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
-            }
-            
-            // Redirect to main page after 2 seconds
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 2000);
-            
-        } catch (error) {
-            this.showNotification('Failed to send inquiry. Please try again.', 'error');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send Inquiry';
-        }
+        });
     }
 
     initCarousels() {
@@ -318,6 +207,7 @@ class CtrlCraftApp {
 
         const ctx = canvas.getContext('2d');
         let particles = [];
+        let animationId;
         
         // Set canvas size
         const resizeCanvas = () => {
@@ -369,10 +259,17 @@ class CtrlCraftApp {
                 particle.draw();
             });
             
-            requestAnimationFrame(animate);
+            animationId = requestAnimationFrame(animate);
         };
 
         animate();
+
+        // Clean up animation when leaving the page
+        window.addEventListener('beforeunload', () => {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        });
     }
 
     showNotification(message, type = 'info') {

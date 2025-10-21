@@ -13,6 +13,7 @@ class EmailHandler {
         this.collectedImages = [];
         this.emailjsLoaded = false;
         this.uploadedFiles = new Set(); // Track uploaded files to prevent duplicates
+        this.isUploading = false; // Prevent multiple uploads
         
         this.init();
     }
@@ -37,50 +38,76 @@ class EmailHandler {
     }
 
     handleFileUpload(files) {
-        const imagePreview = document.getElementById('image-preview');
-        if (!imagePreview) return;
-
-        // Clear existing previews if this is a new selection (not adding to existing)
-        if (files.length > 0) {
-            imagePreview.innerHTML = '';
-            this.collectedImages = [];
-            this.uploadedFiles.clear();
+        // Prevent multiple simultaneous uploads
+        if (this.isUploading) {
+            console.log('Upload already in progress, skipping...');
+            return;
         }
-
-        if (files.length === 0) {
-            imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
+        
+        this.isUploading = true;
+        const imagePreview = document.getElementById('image-preview');
+        if (!imagePreview) {
+            this.isUploading = false;
             return;
         }
 
-        Array.from(files).forEach((file, index) => {
-            if (file.type.startsWith('image/')) {
-                const fileKey = `${file.name}-${file.size}`;
-                
-                // Skip if this file is already uploaded
-                if (this.uploadedFiles.has(fileKey)) {
-                    console.log('Skipping duplicate file:', file.name);
-                    return;
+        // Clear existing previews and collected images
+        imagePreview.innerHTML = '';
+        this.collectedImages = [];
+        this.uploadedFiles.clear();
+
+        if (files.length === 0) {
+            imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
+            this.isUploading = false;
+            return;
+        }
+
+        // Process files one by one to avoid duplicates
+        const processFile = (file, index) => {
+            return new Promise((resolve) => {
+                if (file.type.startsWith('image/')) {
+                    const fileKey = `${file.name}-${file.size}`;
+                    
+                    // Skip if this file is already processed
+                    if (this.uploadedFiles.has(fileKey)) {
+                        console.log('Skipping duplicate file:', file.name);
+                        resolve();
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        // Store base64 image data
+                        this.collectedImages.push({
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            data: e.target.result
+                        });
+                        
+                        // Mark this file as processed
+                        this.uploadedFiles.add(fileKey);
+                        
+                        // Create image preview
+                        this.createImagePreview(file, e.target.result, index);
+                        resolve();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    resolve();
                 }
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    // Store base64 image data
-                    this.collectedImages.push({
-                        name: file.name,
-                        size: file.size,
-                        type: file.type,
-                        data: e.target.result
-                    });
-                    
-                    // Mark this file as uploaded
-                    this.uploadedFiles.add(fileKey);
-                    
-                    // Create image preview
-                    this.createImagePreview(file, e.target.result, index);
-                };
-                reader.readAsDataURL(file);
+            });
+        };
+
+        // Process all files sequentially
+        const processAllFiles = async () => {
+            for (let i = 0; i < files.length; i++) {
+                await processFile(files[i], i);
             }
-        });
+            this.isUploading = false;
+        };
+
+        processAllFiles();
     }
 
     createImagePreview(file, imageData, index) {
@@ -217,7 +244,9 @@ class EmailHandler {
                 controller_type: data['controller-type'] || 'Not specified',
                 timeline: data.timeline || 'Not specified',
                 message: data.message.trim(),
-                image_html: data.imageHtml,
+                image_html: imageHtml.trim(),
+                image_text: imageText.trim(),
+                image_count: this.collectedImages.length.toString(),
                 reply_to: data.email.trim()
             };
             
@@ -278,6 +307,9 @@ class EmailHandler {
             type === 'error' ? 'bg-red-600' : 'bg-blue-600'
         } text-white`;
         notification.textContent = message;
+        notification.style.transform = 'translateX(100%)';
+        notification.style.opacity = '0';
+        notification.style.transition = 'all 0.3s ease';
         
         document.body.appendChild(notification);
         
@@ -304,32 +336,3 @@ class EmailHandler {
 document.addEventListener('DOMContentLoaded', () => {
     new EmailHandler();
 });
-
-// Service card selection functionality
-document.addEventListener('DOMContentLoaded', () => {
-    const serviceCards = document.querySelectorAll('.service-option');
-    const serviceInput = document.getElementById('selected-service');
-    
-    serviceCards.forEach(card => {
-        card.addEventListener('click', () => {
-            // Remove selection from all cards
-            serviceCards.forEach(c => c.classList.remove('selected'));
-            
-            // Add selection to clicked card
-            card.classList.add('selected');
-            
-            // Update hidden form field
-            if (serviceInput) {
-                serviceInput.value = card.dataset.service;
-            }
-        });
-    });
-});
-
-// Function to check if image preview is empty
-function checkEmptyPreview() {
-    const imagePreview = document.getElementById('image-preview');
-    if (imagePreview && imagePreview.children.length === 0) {
-        imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
-    }
-}

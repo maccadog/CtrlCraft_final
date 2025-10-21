@@ -9,6 +9,7 @@
     <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
     <link href="https://unpkg.com/splitting@1.0.6/dist/splitting.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -116,6 +117,22 @@
             justify-content: center;
             align-items: center;
         }
+        /* Dust Animation Styles */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+        }
+        .content-layer {
+            position: relative;
+            z-index: 2;
+        }
     </style>
 </head>
 <body>
@@ -140,9 +157,10 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="pt-24 pb-12 bg-gradient-to-br from-gray-900 via-black to-gray-900">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <!-- Hero Section with Dust Animation -->
+    <section class="hero-section pt-24 pb-12 bg-gradient-to-br from-gray-900 via-black to-gray-900">
+        <canvas id="particle-canvas"></canvas>
+        <div class="content-layer max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 id="hero-title" class="orbitron text-4xl md:text-6xl font-black mb-6 metallic-text"></h1>
             <p class="text-xl text-gray-300 max-w-2xl mx-auto">
                 Tell us about your dream controller and we'll bring it to life with our precision craftsmanship
