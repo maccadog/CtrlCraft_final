@@ -9,11 +9,13 @@ class EmailHandler {
         this.TEMPLATE_ID = 'template_a957hvd'; // Replace with your EmailJS template ID
         this.PUBLIC_KEY = 'S0zUDXqxW2Kw0getx'; // Replace with your EmailJS public key
         
-        // Image collection array
+        // Image collection array - now supports multiple images better
         this.collectedImages = [];
         this.emailjsLoaded = false;
         this.uploadedFiles = new Set(); // Track uploaded files to prevent duplicates
         this.isUploading = false; // Prevent multiple uploads
+        this.maxImages = 10; // Maximum number of images allowed
+        this.maxFileSize = 10 * 1024 * 1024; // 10MB max file size
         
         this.init();
     }
@@ -25,6 +27,7 @@ class EmailHandler {
         // Setup form handlers
         this.setupFormHandlers();
         this.setupImageCollection();
+        this.setupDragAndDrop(); // Add drag and drop support
     }
 
     setupImageCollection() {
@@ -35,6 +38,37 @@ class EmailHandler {
                 this.handleFileUpload(e.target.files);
             });
         }
+    }
+
+    setupDragAndDrop() {
+        const uploadArea = document.querySelector('.file-upload');
+        if (!uploadArea) return;
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, this.preventDefaults, false);
+            document.body.addEventListener(eventName, this.preventDefaults, false);
+        });
+
+        // Highlight drop area when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('drag-over'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('drag-over'), false);
+        });
+
+        // Handle dropped files
+        uploadArea.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            this.handleFileUpload(files);
+        }, false);
+    }
+
+    preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
     }
 
     handleFileUpload(files) {
@@ -51,63 +85,91 @@ class EmailHandler {
             return;
         }
 
-        // Clear existing previews and collected images
-        imagePreview.innerHTML = '';
-        this.collectedImages = [];
-        this.uploadedFiles.clear();
-
-        if (files.length === 0) {
-            imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
+        // Convert FileList to Array for easier handling
+        const fileArray = Array.from(files);
+        
+        // Filter for image files only
+        const imageFiles = fileArray.filter(file => file.type.startsWith('image/'));
+        
+        if (imageFiles.length === 0) {
+            this.showNotification('Please select valid image files.', 'error');
             this.isUploading = false;
             return;
         }
 
-        // Process files one by one to avoid duplicates
-        const processFile = (file, index) => {
-            return new Promise((resolve) => {
-                if (file.type.startsWith('image/')) {
-                    const fileKey = `${file.name}-${file.size}`;
-                    
-                    // Skip if this file is already processed
-                    if (this.uploadedFiles.has(fileKey)) {
-                        console.log('Skipping duplicate file:', file.name);
-                        resolve();
-                        return;
-                    }
-                    
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        // Store base64 image data
-                        this.collectedImages.push({
-                            name: file.name,
-                            size: file.size,
-                            type: file.type,
-                            data: e.target.result
-                        });
-                        
-                        // Mark this file as processed
-                        this.uploadedFiles.add(fileKey);
-                        
-                        // Create image preview
-                        this.createImagePreview(file, e.target.result, index);
-                        resolve();
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    resolve();
-                }
-            });
-        };
-
-        // Process all files sequentially
-        const processAllFiles = async () => {
-            for (let i = 0; i < files.length; i++) {
-                await processFile(files[i], i);
-            }
+        // Check total image limit
+        const totalImages = this.collectedImages.length + imageFiles.length;
+        if (totalImages > this.maxImages) {
+            this.showNotification(`Maximum ${this.maxImages} images allowed. You have ${this.collectedImages.length} already uploaded.`, 'error');
             this.isUploading = false;
-        };
+            return;
+        }
 
-        processAllFiles();
+        // Clear "no files selected" message if this is the first upload
+        if (this.collectedImages.length === 0) {
+            imagePreview.innerHTML = '';
+        }
+
+        // Process each file
+        let processedCount = 0;
+        let errorCount = 0;
+
+        imageFiles.forEach((file, index) => {
+            // Check file size
+            if (file.size > this.maxFileSize) {
+                this.showNotification(`File ${file.name} is too large. Maximum size is 10MB.`, 'error');
+                errorCount++;
+                processedCount++;
+                return;
+            }
+
+            const fileKey = `${file.name}-${file.size}`;
+            
+            // Skip if this file is already processed
+            if (this.uploadedFiles.has(fileKey)) {
+                console.log('Skipping duplicate file:', file.name);
+                processedCount++;
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                // Store image data
+                const imageData = {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    data: e.target.result
+                };
+                
+                this.collectedImages.push(imageData);
+                this.uploadedFiles.add(fileKey);
+                
+                // Create image preview
+                this.createImagePreview(file, e.target.result, this.collectedImages.length - 1);
+                
+                processedCount++;
+                
+                // Check if all files are processed
+                if (processedCount === imageFiles.length) {
+                    this.isUploading = false;
+                    if (errorCount === 0) {
+                        this.showNotification(`${imageFiles.length} image(s) uploaded successfully!`, 'success');
+                    }
+                }
+            };
+            
+            reader.onerror = () => {
+                this.showNotification(`Failed to read file: ${file.name}`, 'error');
+                processedCount++;
+                errorCount++;
+                if (processedCount === imageFiles.length) {
+                    this.isUploading = false;
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        });
     }
 
     createImagePreview(file, imageData, index) {
@@ -116,15 +178,46 @@ class EmailHandler {
         const previewItem = document.createElement('div');
         previewItem.className = 'preview-item';
         previewItem.innerHTML = `
-            <img src="${imageData}" alt="${file.name}">
+            <img src="${imageData}" alt="${file.name}" loading="lazy">
             <div class="file-info">
                 <div class="text-white text-xs truncate">${file.name}</div>
                 <div class="text-gray-400 text-xs">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
             </div>
-            <button type="button" class="remove-btn" onclick="this.parentElement.remove(); checkEmptyPreview();">×</button>
+            <button type="button" class="remove-btn" onclick="emailHandler.removeImage(${index})">×</button>
         `;
         
         imagePreview.appendChild(previewItem);
+    }
+
+    removeImage(index) {
+        // Remove from collected images
+        if (index >= 0 && index < this.collectedImages.length) {
+            const removedImage = this.collectedImages[index];
+            this.collectedImages.splice(index, 1);
+            
+            // Remove from uploaded files tracking
+            const fileKey = `${removedImage.name}-${removedImage.size}`;
+            this.uploadedFiles.delete(fileKey);
+            
+            // Refresh the preview
+            this.refreshImagePreview();
+            
+            this.showNotification('Image removed successfully', 'success');
+        }
+    }
+
+    refreshImagePreview() {
+        const imagePreview = document.getElementById('image-preview');
+        imagePreview.innerHTML = '';
+        
+        if (this.collectedImages.length === 0) {
+            imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
+            return;
+        }
+        
+        this.collectedImages.forEach((img, index) => {
+            this.createImagePreview(img, img.data, index);
+        });
     }
 
     loadEmailJS() {
@@ -140,7 +233,6 @@ class EmailHandler {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
         script.onload = () => {
-            // Initialize EmailJS with your public key
             if (typeof emailjs !== 'undefined') {
                 emailjs.init(this.PUBLIC_KEY);
                 this.emailjsLoaded = true;
@@ -158,21 +250,11 @@ class EmailHandler {
     }
 
     setupFormHandlers() {
-        // Handle inquiry form submissions
         const inquiryForm = document.getElementById('inquiry-form');
         if (inquiryForm) {
             inquiryForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.handleInquirySubmission(e.target);
-            });
-        }
-
-        // Handle contact form submissions (if any)
-        const contactForm = document.getElementById('contact-form');
-        if (contactForm) {
-            contactForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleContactSubmission(e.target);
             });
         }
     }
@@ -182,34 +264,28 @@ class EmailHandler {
         const originalText = submitBtn.textContent;
         
         try {
-            // Check if EmailJS is loaded
             if (!this.emailjsLoaded || typeof emailjs === 'undefined') {
                 throw new Error('Email service is not ready. Please wait a moment and try again.');
             }
             
-            // Show loading state
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
             
-            // Get form data
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
             
-            // Debug: Log form data
             console.log('Form data:', data);
             
-            // Validate required fields
             if (!data.name || !data.email || !data.message || !data['shipping-confirm']) {
                 throw new Error('Please fill in all required fields and confirm shipping requirements');
             }
             
-            // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(data.email)) {
                 throw new Error('Please enter a valid email address');
             }
             
-            // Prepare image data for email - create HTML with embedded images
+            // Prepare image data
             let imageHtml = '<p><strong>No images uploaded</strong></p>';
             let imageText = 'No images uploaded';
             
@@ -218,7 +294,6 @@ class EmailHandler {
                 imageText = 'Reference Images:\n';
                 
                 this.collectedImages.forEach((img, index) => {
-                    // Add image to HTML email
                     imageHtml += `
                         <div style="display: inline-block; margin: 10px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
                             <img src="${img.data}" alt="${img.name}" style="max-width: 200px; max-height: 200px; display: block; margin-bottom: 5px;">
@@ -226,17 +301,14 @@ class EmailHandler {
                             <p style="font-size: 11px; margin: 0; text-align: center; color: #666;">Size: ${(img.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
                     `;
-                    
-                    // Add to plain text
                     imageText += `Image ${index + 1}: ${img.name} (${(img.size / 1024 / 1024).toFixed(2)} MB)\n`;
                 });
                 
                 imageHtml += '</div>';
             }
             
-            // Prepare email parameters - FIXED VARIABLE NAMES
             const emailParams = {
-                to_email: 'mackenzie5688@gmail.com', // Your email address
+                to_email: 'mackenzie5688@gmail.com',
                 from_name: data.name.trim(),
                 from_email: data.email.trim(),
                 phone: data.phone || 'Not provided',
@@ -244,44 +316,28 @@ class EmailHandler {
                 controller_type: data['controller-type'] || 'Not specified',
                 timeline: data.timeline || 'Not specified',
                 message: data.message.trim(),
-                image_html: imageHtml.trim(), // Fixed: was imageHtml
-                image_text: imageText.trim(), // Fixed: was imageText
+                image_html: imageHtml.trim(),
+                image_text: imageText.trim(),
                 image_count: this.collectedImages.length.toString(),
                 reply_to: data.email.trim()
             };
             
-            // Debug: Log email parameters
             console.log('Email params:', emailParams);
             console.log('Images collected:', this.collectedImages.length);
             
-            // Send email using EmailJS
             const response = await emailjs.send(
                 this.SERVICE_ID,
                 this.TEMPLATE_ID,
                 emailParams
             );
             
-            // Debug: Log response
             console.log('EmailJS response:', response);
             
             if (response.status === 200 || response.text === 'OK') {
                 this.showNotification('Inquiry sent successfully! I\'ll contact you soon.', 'success');
                 form.reset();
-                this.collectedImages = [];
-                this.uploadedFiles.clear();
+                this.resetForm();
                 
-                // Reset service selection if exists
-                document.querySelectorAll('.service-option').forEach(card => {
-                    card.classList.remove('selected');
-                });
-                
-                // Reset image preview
-                const imagePreview = document.getElementById('image-preview');
-                if (imagePreview) {
-                    imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
-                }
-                
-                // Redirect to main page after 3 seconds
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 3000);
@@ -293,14 +349,28 @@ class EmailHandler {
             console.error('Email sending error:', error);
             this.showNotification(error.message || 'Failed to send inquiry. Please try again.', 'error');
         } finally {
-            // Reset button state
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         }
     }
 
+    resetForm() {
+        this.collectedImages = [];
+        this.uploadedFiles.clear();
+        
+        // Reset service selection
+        document.querySelectorAll('.service-option').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Reset image preview
+        const imagePreview = document.getElementById('image-preview');
+        if (imagePreview) {
+            imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
+        }
+    }
+
     showNotification(message, type = 'info') {
-        // Create notification element
         const notification = document.createElement('div');
         notification.className = `fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
             type === 'success' ? 'bg-green-600' : 
@@ -313,13 +383,11 @@ class EmailHandler {
         
         document.body.appendChild(notification);
         
-        // Animate in
         setTimeout(() => {
             notification.style.transform = 'translateX(0)';
             notification.style.opacity = '1';
         }, 100);
         
-        // Remove after 5 seconds
         setTimeout(() => {
             notification.style.transform = 'translateX(100%)';
             notification.style.opacity = '0';
@@ -333,6 +401,15 @@ class EmailHandler {
 }
 
 // Initialize the email handler when the page loads
+let emailHandler;
 document.addEventListener('DOMContentLoaded', () => {
-    new EmailHandler();
+    emailHandler = new EmailHandler();
 });
+
+// Global function for backward compatibility
+function checkEmptyPreview() {
+    const imagePreview = document.getElementById('image-preview');
+    if (imagePreview && imagePreview.children.length === 0) {
+        imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
+    }
+}

@@ -45,6 +45,8 @@
             border: 2px solid rgba(75, 85, 99, 0.5);
             transition: all 0.3s ease;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
         .service-option:hover {
             border-color: rgba(20, 184, 166, 0.5);
@@ -57,6 +59,7 @@
         .file-upload {
             border: 2px dashed rgba(75, 85, 99, 0.5);
             transition: all 0.3s ease;
+            position: relative;
         }
         .file-upload:hover {
             border-color: #14b8a6;
@@ -83,11 +86,20 @@
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid rgba(75, 85, 99, 0.3);
+            transition: all 0.3s ease;
+        }
+        .preview-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(20, 184, 166, 0.2);
         }
         .preview-item img {
             width: 100%;
             height: 120px;
             object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .preview-item:hover img {
+            transform: scale(1.05);
         }
         .preview-item .file-info {
             padding: 0.5rem;
@@ -108,9 +120,11 @@
             align-items: center;
             justify-content: center;
             font-size: 0.875rem;
+            transition: all 0.3s ease;
         }
         .preview-item .remove-btn:hover {
             background: rgba(239, 68, 68, 1);
+            transform: scale(1.1);
         }
         .phone-center {
             display: flex;
@@ -132,6 +146,92 @@
         .content-layer {
             position: relative;
             z-index: 2;
+        }
+        /* Enhanced Upload Styles */
+        .upload-info {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+        .upload-progress {
+            margin-top: 0.5rem;
+            height: 2px;
+            background: rgba(75, 85, 99, 0.3);
+            border-radius: 1px;
+            overflow: hidden;
+        }
+        .upload-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #14b8a6, #3b82f6);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        /* Drag and Drop Styles */
+        .file-upload.drag-over {
+            border-color: #14b8a6 !important;
+            background: rgba(20, 184, 166, 0.1) !important;
+            transform: scale(1.02);
+        }
+        /* Animation Enhancements */
+        .floating-element {
+            animation: subtleFloat 6s ease-in-out infinite;
+        }
+        @keyframes subtleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .service-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        .service-option:hover::before {
+            left: 100%;
+        }
+        /* Form Enhancements */
+        .form-input:hover {
+            border-color: rgba(20, 184, 166, 0.3);
+        }
+        .form-input:focus:hover {
+            border-color: #14b8a6;
+        }
+        /* Button Enhancements */
+        button, .btn {
+            position: relative;
+            overflow: hidden;
+        }
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        /* Image Counter */
+        .image-counter {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(20, 184, 166, 0.9);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -171,7 +271,7 @@
     <!-- Inquiry Form -->
     <section class="py-20 bg-black">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="form-container rounded-2xl p-8 md:p-12 scroll-reveal">
+            <div class="form-container rounded-2xl p-8 md:p-12 scroll-reveal floating-element">
                 <form id="inquiry-form" class="space-y-8">
                     <!-- Service Selection -->
                     <div>
@@ -246,19 +346,25 @@
                     </div>
 
                     <!-- File Upload -->
-                    <div>
+                    <div class="relative">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Reference Images (Optional)</label>
                         <div class="file-upload rounded-lg p-6 text-center">
                             <input type="file" id="inspiration-upload" name="inspiration" multiple 
                                    accept="image/*" class="hidden">
                             <button type="button" onclick="document.getElementById('inspiration-upload').click()" 
-                                    class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg transition-colors">
-                                Choose Files
+                                    class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg transition-all transform hover:scale-105">
+                                Choose Files or Drag & Drop
                             </button>
                             <p class="text-sm text-gray-400 mt-2">Upload inspiration images or reference photos</p>
+                            <div class="upload-info">
+                                Max 10 images, 10MB each. Supports JPG, PNG, GIF
+                            </div>
                             <div id="image-preview" class="image-preview mt-4">
                                 <p class="text-gray-400 text-sm text-center">No files selected</p>
                             </div>
+                        </div>
+                        <div id="image-counter" class="image-counter" style="display: none;">
+                            0/10
                         </div>
                     </div>
 
