@@ -1,4 +1,4 @@
-// CtrlCraft Main JavaScript - Fixed Version
+// CtrlCraft Main JavaScript - Fixed Version with Dust Animation
 // Using CDN versions of libraries instead of ES6 imports
 
 class CtrlCraftApp {
@@ -12,6 +12,7 @@ class CtrlCraftApp {
         this.setupFormHandlers();
         this.initCarousels();
         this.createParticleEffect();
+        this.initDustAnimation(); // Add dust animation initialization
     }
 
     setupEventListeners() {
@@ -58,6 +59,13 @@ class CtrlCraftApp {
         setTimeout(() => {
             this.animateServiceCards();
         }, 1000);
+
+        // Auto-trigger scroll reveal animations for inquiry page
+        if (window.location.pathname.includes('inquiry.html')) {
+            setTimeout(() => {
+                this.triggerScrollAnimations();
+            }, 500);
+        }
     }
 
     typewriterEffect(element, text, speed = 50) {
@@ -116,6 +124,16 @@ class CtrlCraftApp {
         });
     }
 
+    // New method to trigger animations without scroll
+    triggerScrollAnimations() {
+        const elements = document.querySelectorAll('.scroll-reveal');
+        elements.forEach((element, index) => {
+            setTimeout(() => {
+                element.classList.add('active');
+            }, index * 100);
+        });
+    }
+
     setupFormHandlers() {
         const inquiryForm = document.getElementById('inquiry-form');
         if (inquiryForm) {
@@ -162,13 +180,24 @@ class CtrlCraftApp {
         const imagePreview = document.getElementById('image-preview');
         if (imagePreview && input.files.length > 0) {
             imagePreview.innerHTML = '';
+            
+            // Create a Set to track unique files by name and size
+            const uniqueFiles = new Map();
+            
             Array.from(input.files).forEach((file, index) => {
                 if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.createImagePreview(file, e.target.result, index);
-                    };
-                    reader.readAsDataURL(file);
+                    const fileKey = `${file.name}-${file.size}`;
+                    
+                    // Only process if this file combination is not already seen
+                    if (!uniqueFiles.has(fileKey)) {
+                        uniqueFiles.set(fileKey, file);
+                        
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.createImagePreview(file, e.target.result, index);
+                        };
+                        reader.readAsDataURL(file);
+                    }
                 }
             });
         } else if (imagePreview) {
@@ -280,6 +309,70 @@ class CtrlCraftApp {
                 section.appendChild(particle);
             }
         });
+    }
+
+    // New method for dust animation
+    initDustAnimation() {
+        const canvas = document.getElementById('particle-canvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        // Set canvas size
+        const resizeCanvas = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Particle class
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(20, 184, 166, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        // Create particles
+        for (let i = 0; i < 50; i++) {
+            particles.push(new Particle());
+        }
+
+        // Animation loop
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            requestAnimationFrame(animate);
+        };
+
+        animate();
     }
 
     showNotification(message, type = 'info') {

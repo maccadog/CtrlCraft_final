@@ -12,6 +12,7 @@ class EmailHandler {
         // Image collection array
         this.collectedImages = [];
         this.emailjsLoaded = false;
+        this.uploadedFiles = new Set(); // Track uploaded files to prevent duplicates
         
         this.init();
     }
@@ -39,9 +40,12 @@ class EmailHandler {
         const imagePreview = document.getElementById('image-preview');
         if (!imagePreview) return;
 
-        // Clear existing previews
-        imagePreview.innerHTML = '';
-        this.collectedImages = [];
+        // Clear existing previews if this is a new selection (not adding to existing)
+        if (files.length > 0) {
+            imagePreview.innerHTML = '';
+            this.collectedImages = [];
+            this.uploadedFiles.clear();
+        }
 
         if (files.length === 0) {
             imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
@@ -50,6 +54,14 @@ class EmailHandler {
 
         Array.from(files).forEach((file, index) => {
             if (file.type.startsWith('image/')) {
+                const fileKey = `${file.name}-${file.size}`;
+                
+                // Skip if this file is already uploaded
+                if (this.uploadedFiles.has(fileKey)) {
+                    console.log('Skipping duplicate file:', file.name);
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     // Store base64 image data
@@ -59,6 +71,9 @@ class EmailHandler {
                         type: file.type,
                         data: e.target.result
                     });
+                    
+                    // Mark this file as uploaded
+                    this.uploadedFiles.add(fileKey);
                     
                     // Create image preview
                     this.createImagePreview(file, e.target.result, index);
@@ -226,6 +241,7 @@ class EmailHandler {
                 this.showNotification('Inquiry sent successfully! I\'ll contact you soon.', 'success');
                 form.reset();
                 this.collectedImages = [];
+                this.uploadedFiles.clear();
                 
                 // Reset service selection if exists
                 document.querySelectorAll('.service-option').forEach(card => {
