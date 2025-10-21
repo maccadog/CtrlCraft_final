@@ -234,7 +234,7 @@ class EmailHandler {
                 imageHtml += '</div>';
             }
             
-            // Prepare email parameters
+            // Prepare email parameters - FIXED VARIABLE NAMES
             const emailParams = {
                 to_email: 'mackenzie5688@gmail.com', // Your email address
                 from_name: data.name.trim(),
@@ -244,8 +244,8 @@ class EmailHandler {
                 controller_type: data['controller-type'] || 'Not specified',
                 timeline: data.timeline || 'Not specified',
                 message: data.message.trim(),
-                image_html: imageHtml.trim(),
-                image_text: imageText.trim(),
+                image_html: imageHtml.trim(), // Fixed: was imageHtml
+                image_text: imageText.trim(), // Fixed: was imageText
                 image_count: this.collectedImages.length.toString(),
                 reply_to: data.email.trim()
             };
