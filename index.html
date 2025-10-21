@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CtrlCraft - Precision Gaming, Perfected</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
+    <link href="https://unpkg.com/splitting@1.0.6/dist/splitting.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/js/splide.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/css/splide.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.14.0/dist/pixi.min.js"></script>
+
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+        .orbitron { font-family: 'Orbitron', monospace; }
+        .jetbrains { font-family: 'JetBrains Mono', monospace; }
+        .hero-bg {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .metallic-text {
+            background: linear-gradient(135deg, #c0c0c0, #ffffff, #c0c0c0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .teal-glow {
+            box-shadow: 0 0 20px rgba(20, 184, 166, 0.3);
+        }
+        .service-card {
+            background: linear-gradient(135deg, rgba(45, 45, 45, 0.9), rgba(26, 26, 26, 0.9));
+            border: 1px solid rgba(20, 184, 166, 0.2);
+            transition: all 0.3s ease;
+            opacity: 0; /* Start hidden for animation */
+        }
+        .service-card:hover {
+            border-color: rgba(20, 184, 166, 0.5);
+            transform: translateY(-5px);
+        }
+        .tech-icon {
+            background: linear-gradient(135deg, #14b8a6, #3b82f6);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .content-layer {
+            position: relative;
+            z-index: 2;
+        }
+        .portfolio-item {
+            background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .portfolio-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(20, 184, 166, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-black bg-opacity-90 backdrop-blur-sm z-50 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <img src="ctrlcraft.png" alt="CtrlCraft Logo" class="h-10 w-10 mr-3">
+                        <span class="orbitron text-xl font-bold metallic-text">CtrlCraft</span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="text-teal-400 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">Home</a>
+                        <a href="about.html" class="text-gray-300 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">About</a>
+                        <a href="inquiry.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Inquiry</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-95">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="index.html" class="text-teal-400 block px-3 py-2 text-base font-medium">Home</a>
+                <a href="about.html" class="text-gray-300 hover:text-teal-300 block px-3 py-2 text-base font-medium">About</a>
+                <a href="inquiry.html" class="bg-teal-600 hover:bg-teal-700 text-white block px-3 py-2 rounded-lg text-base font-medium">Inquiry</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center pt-16">
+        <canvas id="particle-canvas"></canvas>
+        <div class="content-layer w-full">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="text-center lg:text-left">
+                        <h1 id="hero-title" class="orbitron text-5xl md:text-7xl font-black mb-6 metallic-text"></h1>
+                        <p class="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
+                            New Zealand's premier professional-grade custom painted controller specialists. 
+                            Using cutting-edge spray booth technology, vacuum metallizing, and PVD coating 
+                            for the ultimate precision finish. We proudly serve NZ gamers with local expertise 
+                            and fast turnaround times.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                            <a href="inquiry.html" class="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 teal-glow">
+                                Start Customization
+                            </a>
+                            <a href="about.html" class="border border-teal-400 text-teal-400 hover:bg-teal-400 hover:text-black px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300">
+                                Learn More
+                            </a>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <img src="hero_workshop.png" alt="Professional Controller Workshop" class="w-full h-auto rounded-2xl shadow-2xl">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent rounded-2xl"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="orbitron text-4xl md:text-5xl font-bold mb-6 metallic-text">Our Services</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Professional controller customization using industry-leading technology and techniques
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="service-card p-8 rounded-xl scroll-reveal">
+                    <div class="tech-icon mb-6 mx-auto">
+                        🎨
+                    </div>
+                    <h3 class="orbitron text-2xl font-bold mb-4 text-center">Custom Painting</h3>
+                    <p class="text-gray-300 text-center mb-6">
+                        Professional-grade custom painted controllers using automotive-grade paints in our spray booth. 
+                        We specialize in precision paint application - no attachments or modifications, just flawless finishes.
+                    </p>
+                    <ul class="text-sm text-gray-400 space-y-2">
+                        <li>• Automotive-grade paints</li>
+                        <li>• Professional spray booth</li>
+                        <li>• UV-resistant clear coat</li>
+                        <li>• Custom color matching</li>
+                    </ul>
+                </div>
+
+                <div class="service-card p-8 rounded-xl scroll-reveal">
+                    <div class="tech-icon mb-6 mx-auto">
+                        ✨
+                    </div>
+                    <h3 class="orbitron text-2xl font-bold mb-4 text-center">Vacuum Metallizing</h3>
+                    <p class="text-gray-300 text-center mb-6">
+                        Professional-grade custom painted controllers with cutting-edge vacuum metallizing technology 
+                        for stunning metallic finishes and mirror-like surfaces. Pure finish enhancement - no attachments.
+                    </p>
+                    <ul class="text-sm text-gray-400 space-y-2">
+                        <li>• Mirror-like finishes</li>
+                        <li>• Multiple metal options</li>
+                        <li>• Vacuum-sealed process</li>
+                        <li>• Corrosion resistant</li>
+                    </ul>
+                </div>
+
+                <div class="service-card p-8 rounded-xl scroll-reveal">
+                    <div class="tech-icon mb-6 mx-auto">
+                        🔬
+                    </div>
+                    <h3 class="orbitron text-2xl font-bold mb-4 text-center">PVD Coating</h3>
+                    <p class="text-gray-300 text-center mb-6">
+                        Professional-grade custom painted controllers using hyper-modern Physical Vapor Deposition 
+                        for extreme durability and unique aesthetic effects. Premium finish work only.
+                    </p>
+                    <ul class="text-sm text-gray-400 space-y-2">
+                        <li>• Extreme durability</li>
+                        <li>• Unique color effects</li>
+                        <li>• Scratch resistant</li>
+                        <li>• Environmentally friendly</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Showcase -->
+    <section class="py-20 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="orbitron text-4xl md:text-5xl font-bold mb-6 metallic-text">Advanced Technology</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    We employ the same technologies used in aerospace and automotive industries
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
+                <div class="scroll-reveal">
+                    <div class="bg-gradient-to-br from-teal-600 to-blue-600 w-20 h-20 rounded-full flex items-center justify-center text-3xl mb-6">
+                        🏭
+                    </div>
+                    <h3 class="orbitron text-2xl font-bold mb-4">Professional Spray Booth</h3>
+                    <p class="text-gray-300">
+                        Climate-controlled environment ensuring perfect application conditions every time. 
+                        Our booth maintains consistent temperature and humidity for flawless finishes.
+                    </p>
+                </div>
+
+                <div class="scroll-reveal">
+                    <div class="bg-gradient-to-br from-purple-600 to-pink-600 w-20 h-20 rounded-full flex items-center justify-center text-3xl mb-6">
+                        🌌
+                    </div>
+                    <h3 class="orbitron text-2xl font-bold mb-4">Vacuum Metallizing</h3>
+                    <p class="text-gray-300">
+                        Advanced vacuum chamber technology creates molecular-level metal bonding for 
+                        unparalleled adhesion and mirror-like reflective surfaces.
+                    </p>
+                </div>
+
+                <div class="scroll-reveal">
+                    <div class="bg-gradient-to-br from-orange-600 to-red-600 w-20 h-20 rounded-full flex items-center justify-center text-3xl mb-6">
+                        ⚡
+                    </div>
+                    <h3 class="orbitron text-2xl font-bold mb-4">PVD Machine Technology</h3>
+                    <p class="text-gray-300">
+                        Physical Vapor Deposition creates ultra-thin, extremely hard coatings with 
+                        unique optical properties and exceptional wear resistance.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Gallery -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="orbitron text-4xl md:text-5xl font-bold mb-6 metallic-text">Featured Work</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Explore our portfolio of custom controller masterpieces
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="portfolio-item scroll-reveal">
+                    <img src="https://kimi-web-img.moonshot.cn/img/img.freepik.com/ad1fda9800d326e740598febd634809811b5ea12.jpg" alt="Custom Controller 1" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h3 class="orbitron text-xl font-bold mb-2">Galaxy Edition</h3>
+                        <p class="text-gray-400 text-sm">Custom spray paint with metallic accents</p>
+                    </div>
+                </div>
+
+                <div class="portfolio-item scroll-reveal">
+                    <img src="https://kimi-web-img.moonshot.cn/img/mydown-img2.yesky.com/0f8bcdb6eafc900b5366754789da3ace157cc9a5.png" alt="Custom Controller 2" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h3 class="orbitron text-xl font-bold mb-2">Chrome Mirror</h3>
+                        <p class="text-gray-400 text-sm">Vacuum metallized finish</p>
+                    </div>
+                </div>
+
+                <div class="portfolio-item scroll-reveal">
+                    <img src="https://kimi-web-img.moonshot.cn/img/wallpapercave.com/7595745b89cdd5deedbd3e647cea0d24ea1dfdc4.jpg" alt="Custom Controller 3" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h3 class="orbitron text-xl font-bold mb-2">Carbon Fiber</h3>
+                        <p class="text-gray-400 text-sm">PVD coating with texture</p>
+                    </div>
+                </div>
+
+                <div class="portfolio-item scroll-reveal">
+                    <img src="https://kimi-web-img.moonshot.cn/img/www.shutterstock.com/2cb12650db088e55d125393d810188bae5d920c1.jpg" alt="Custom Controller 4" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h3 class="orbitron text-xl font-bold mb-2">Aurora Borealis</h3>
+                        <p class="text-gray-400 text-sm">Color-shifting PVD coating</p>
+                    </div>
+                </div>
+
+                <div class="portfolio-item scroll-reveal">
+                    <img src="https://kimi-web-img.moonshot.cn/img/i.etsystatic.com/679bf8c3d0b88c493b2e8048cb33504675f1d227.jpg" alt="Custom Controller 5" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h3 class="orbitron text-xl font-bold mb-2">Matte Blackout</h3>
+                        <p class="text-gray-400 text-sm">Professional matte finish</p>
+                    </div>
+                </div>
+
+                <div class="portfolio-item scroll-reveal">
+                    <img src="https://kimi-web-img.moonshot.cn/img/img.freepik.com/0898f4b209af0392bfc249b8ea3d437041b0faef.jpg" alt="Custom Controller 6" class="w-full h-64 object-cover">
+                    <div class="p-6">
+                        <h3 class="orbitron text-xl font-bold mb-2">Titanium Blue</h3>
+                        <p class="text-gray-400 text-sm">Metallic PVD coating</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <a href="inquiry.html" class="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 inline-block teal-glow">
+                    Get Your Custom Controller
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-20 bg-black">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="orbitron text-4xl md:text-5xl font-bold mb-6 metallic-text">Ready to Transform Your Controller?</h2>
+            <p class="text-xl text-gray-300 mb-8">
+                Join hundreds of gamers who've elevated their gaming experience with our professional customization services.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="inquiry.html" class="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 teal-glow">
+                    Start Your Project
+                </a>
+                <a href="about.html" class="border border-teal-400 text-teal-400 hover:bg-teal-400 hover:text-black px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300">
+                    Learn Our Process
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <img src="ctrlcraft.png" alt="CtrlCraft Logo" class="h-8 w-8 mr-3">
+                    <span class="orbitron text-lg font-bold metallic-text">CtrlCraft</span>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-gray-400 text-sm">
+                        © 2024 CtrlCraft. Precision Gaming, Perfected.
+                    </p>
+                    <p class="text-gray-500 text-xs mt-1">
+                        Professional controller customization services
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Load main.js at the end of body to ensure DOM is ready -->
+    <script src="main.js"></script>
+</body>
+</html>

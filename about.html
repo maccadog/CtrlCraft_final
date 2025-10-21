@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - CtrlCraft</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
+    <link href="https://unpkg.com/splitting@1.0.6/dist/splitting.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+        .orbitron { font-family: 'Orbitron', monospace; }
+        .jetbrains { font-family: 'JetBrains Mono', monospace; }
+        .metallic-text {
+            background: linear-gradient(135deg, #c0c0c0, #ffffff, #c0c0c0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .process-step {
+            background: linear-gradient(135deg, rgba(45, 45, 45, 0.9), rgba(26, 26, 26, 0.9));
+            border: 1px solid rgba(20, 184, 166, 0.2);
+            transition: all 0.3s ease;
+        }
+        .process-step:hover {
+            border-color: rgba(20, 184, 166, 0.5);
+            transform: translateY(-5px);
+        }
+        .tech-spec {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            border-left: 4px solid #14b8a6;
+        }
+        .comparison-slider {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        .comparison-before,
+        .comparison-after {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .comparison-after {
+            clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
+            transition: clip-path 0.3s ease;
+        }
+        .slider-handle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #14b8a6;
+            border-radius: 50%;
+            cursor: ew-resize;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-black bg-opacity-90 backdrop-blur-sm z-50 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <img src="ctrlcraft.png" alt="CtrlCraft Logo" class="h-10 w-10 mr-3">
+                        <span class="orbitron text-xl font-bold metallic-text">CtrlCraft</span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="text-gray-300 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">Home</a>
+                        <a href="about.html" class="text-teal-400 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">About</a>
+                        <a href="inquiry.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Inquiry</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-300 hover:text-white">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-95">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="index.html" class="text-gray-300 hover:text-teal-300 block px-3 py-2 text-base font-medium">Home</a>
+                <a href="about.html" class="text-teal-400 block px-3 py-2 text-base font-medium">About</a>
+                <a href="inquiry.html" class="bg-teal-600 hover:bg-teal-700 text-white block px-3 py-2 rounded-lg text-base font-medium">Inquiry</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-16 bg-gradient-to-br from-gray-900 via-black to-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="orbitron text-5xl md:text-6xl font-black mb-6 metallic-text">About CtrlCraft</h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Where precision engineering meets artistic excellence in gaming controller customization
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Company Story -->
+    <section class="py-20 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="scroll-reveal">
+                    <h2 class="orbitron text-4xl font-bold mb-6 metallic-text">Our Story</h2>
+                    <p class="text-gray-300 text-lg mb-6 leading-relaxed">
+                        CtrlCraft is New Zealand's premier custom controller specialists, born from a passion for gaming 
+                        and precision engineering. Founded by a team of aerospace manufacturing specialists and gaming 
+                        enthusiasts right here in Aotearoa, we recognized the gap between mass-produced controllers and 
+                        the level of quality that serious Kiwi gamers deserve.
+                    </p>
+                    <p class="text-gray-300 text-lg mb-6 leading-relaxed">
+                        Our journey began in professional spray booths and vacuum chambers, where we applied 
+                        the same rigorous standards used in aerospace components to gaming controllers. 
+                        The result is a level of finish and durability that exceeds even the original manufacturers.
+                    </p>
+                    <p class="text-gray-300 text-lg leading-relaxed">
+                        Today, we're proud to serve gamers across New Zealand, from casual enthusiasts to professional 
+                        esports athletes, delivering custom controllers that don't just look amazing—they 
+                        perform at the highest level. As a Kiwi-owned business, we understand the unique needs 
+                        of New Zealand gamers and provide local expertise with fast nationwide delivery.
+                    </p>
+                </div>
+                <div class="scroll-reveal">
+                    <img src="hero_workshop.png" alt="Professional Workshop" class="w-full h-auto rounded-2xl shadow-2xl">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- New Zealand Focus -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="orbitron text-4xl font-bold mb-6 metallic-text">Proudly New Zealand Owned</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Serving Kiwi gamers with local expertise and fast nationwide delivery
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center scroll-reveal">
+                    <div class="text-6xl mb-4">🇳🇿</div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Kiwi Owned</h3>
+                    <p class="text-gray-300">
+                        100% New Zealand owned and operated, supporting local gaming communities
+                    </p>
+                </div>
+
+                <div class="text-center scroll-reveal">
+                    <div class="text-6xl mb-4">🚚</div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Fast NZ Delivery</h3>
+                    <p class="text-gray-300">
+                        Quick turnaround times with fast, secure delivery across New Zealand
+                    </p>
+                </div>
+
+                <div class="text-center scroll-reveal">
+                    <div class="text-6xl mb-4">💬</div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Local Support</h3>
+                    <p class="text-gray-300">
+                        Friendly Kiwi customer service and support throughout your customization journey
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Timeline -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="orbitron text-4xl font-bold mb-6 metallic-text">Our Process</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    A meticulous 6-step process ensuring perfection in every controller
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="process-step p-6 rounded-xl scroll-reveal">
+                    <div class="bg-teal-600 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">1</div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Consultation</h3>
+                    <p class="text-gray-300 text-sm">
+                        We discuss your vision, gaming style, and preferences to create the perfect design concept.
+                    </p>
+                </div>
+
+                <div class="process-step p-6 rounded-xl scroll-reveal">
+                    <div class="bg-teal-600 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">2</div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Disassembly</h3>
+                    <p class="text-gray-300 text-sm">
+                        Professional disassembly with precision tools, ensuring all components are protected and documented.
+                    </p>
+                </div>
+
+                <div class="process-step p-6 rounded-xl scroll-reveal">
+                    <div class="bg-teal-600 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">3</div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Surface Prep</h3>
+                    <p class="text-gray-300 text-sm">
+                        Meticulous cleaning, sanding, and preparation to ensure perfect adhesion of all coatings.
+                    </p>
+                </div>
+
+                <div class="process-step p-6 rounded-xl scroll-reveal">
+                    <div class="bg-teal-600 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">4</div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Application</h3>
+                    <p class="text-gray-300 text-sm">
+                        Professional application using our advanced spray booth, vacuum metallizing, or PVD coating systems.
+                    </p>
+                </div>
+
+                <div class="process-step p-6 rounded-xl scroll-reveal">
+                    <div class="bg-teal-600 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">5</div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Curing</h3>
+                    <p class="text-gray-300 text-sm">
+                        Controlled curing process to ensure maximum durability and finish quality.
+                    </p>
+                </div>
+
+                <div class="process-step p-6 rounded-xl scroll-reveal">
+                    <div class="bg-teal-600 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4">6</div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Assembly & QA</h3>
+                    <p class="text-gray-300 text-sm">
+                        Professional reassembly with rigorous quality assurance testing before delivery.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Deep Dive -->
+    <section class="py-20 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="orbitron text-4xl font-bold mb-6 metallic-text">Technology Specifications</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Industry-leading equipment and processes for superior results
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="scroll-reveal">
+                    <div class="tech-spec p-6 rounded-xl mb-6">
+                        <h3 class="orbitron text-2xl font-bold mb-4 text-teal-400">Spray Booth System</h3>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Temperature Control:</span>
+                                <span class="jetbrains text-teal-400">±2°C</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Humidity Control:</span>
+                                <span class="jetbrains text-teal-400">±5% RH</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Filtration:</span>
+                                <span class="jetbrains text-teal-400">HEPA 99.97%</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Paint Pressure:</span>
+                                <span class="jetbrains text-teal-400">2.5-3.0 bar</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="scroll-reveal">
+                    <div class="tech-spec p-6 rounded-xl mb-6">
+                        <h3 class="orbitron text-2xl font-bold mb-4 text-teal-400">Vacuum Metallizing</h3>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Vacuum Level:</span>
+                                <span class="jetbrains text-teal-400">10⁻⁶ mbar</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Chamber Size:</span>
+                                <span class="jetbrains text-teal-400">600mm Ø</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Metal Types:</span>
+                                <span class="jetbrains text-teal-400">Al, Cr, Ti</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Deposition Rate:</span>
+                                <span class="jetbrains text-teal-400">0.1-2 nm/s</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="scroll-reveal">
+                    <div class="tech-spec p-6 rounded-xl mb-6">
+                        <h3 class="orbitron text-2xl font-bold mb-4 text-teal-400">PVD Coating</h3>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Process Temp:</span>
+                                <span class="jetbrains text-teal-400">150-500°C</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Coating Thickness:</span>
+                                <span class="jetbrains text-teal-400">1-5 μm</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Hardness:</span>
+                                <span class="jetbrains text-teal-400">2000-3000 HV</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span class="text-gray-300">Adhesion:</span>
+                                <span class="jetbrains text-teal-400">Class 1</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Before/After Comparison -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="orbitron text-4xl font-bold mb-6 metallic-text">Transformation Examples</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    See the dramatic difference our processes can achieve
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="scroll-reveal">
+                    <h3 class="orbitron text-2xl font-bold mb-6 text-center">Vacuum Metallizing</h3>
+                    <div class="comparison-slider h-80 bg-gray-800 relative">
+                        <div class="comparison-before">
+                            <img src="https://kimi-web-img.moonshot.cn/img/i.etsystatic.com/0f5001ee6c9003fb5bd3a11194a734da7634433a.jpg" alt="Before" class="w-full h-full object-cover">
+                        </div>
+                        <div class="comparison-after">
+                            <img src="https://kimi-web-img.moonshot.cn/img/mydown-img2.yesky.com/0f8bcdb6eafc900b5366754789da3ace157cc9a5.png" alt="After" class="w-full h-full object-cover">
+                        </div>
+                        <div class="slider-handle">⟷</div>
+                    </div>
+                    <p class="text-center text-gray-400 text-sm mt-4">
+                        Standard controller transformed with mirror-like chrome finish
+                    </p>
+                </div>
+
+                <div class="scroll-reveal">
+                    <h3 class="orbitron text-2xl font-bold mb-6 text-center">Custom Paint Work</h3>
+                    <div class="comparison-slider h-80 bg-gray-800 relative">
+                        <div class="comparison-before">
+                            <img src="https://kimi-web-img.moonshot.cn/img/xboxdesignlab.xbox.com/384a9c1205f46efd35a59cd612b0d1890d39978c.png" alt="Before" class="w-full h-full object-cover">
+                        </div>
+                        <div class="comparison-after">
+                            <img src="https://kimi-web-img.moonshot.cn/img/img.freepik.com/ad1fda9800d326e740598febd634809811b5ea12.jpg" alt="After" class="w-full h-full object-cover">
+                        </div>
+                        <div class="slider-handle">⟷</div>
+                    </div>
+                    <p class="text-center text-gray-400 text-sm mt-4">
+                        Professional custom paint with galaxy theme and metallic accents
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quality Commitment -->
+    <section class="py-20 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="orbitron text-4xl font-bold mb-6 metallic-text">Quality Commitment</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Every controller meets aerospace-grade quality standards
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center scroll-reveal">
+                    <div class="bg-teal-600 w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                        🛡️
+                    </div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Lifetime Warranty</h3>
+                    <p class="text-gray-300 text-sm">
+                        All finishes backed by our comprehensive lifetime warranty against defects.
+                    </p>
+                </div>
+
+                <div class="text-center scroll-reveal">
+                    <div class="bg-teal-600 w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                        🔬
+                    </div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Lab Tested</h3>
+                    <p class="text-gray-300 text-sm">
+                        All coatings tested for durability, adhesion, and wear resistance.
+                    </p>
+                </div>
+
+                <div class="text-center scroll-reveal">
+                    <div class="bg-teal-600 w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                        ✅
+                    </div>
+                    <h3 class="orbitron text-xl font-bold mb-3">QA Inspected</h3>
+                    <p class="text-gray-300 text-sm">
+                        Every controller undergoes rigorous quality assurance before delivery.
+                    </p>
+                </div>
+
+                <div class="text-center scroll-reveal">
+                    <div class="bg-teal-600 w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                        🎯
+                    </div>
+                    <h3 class="orbitron text-xl font-bold mb-3">Precision Fit</h3>
+                    <p class="text-gray-300 text-sm">
+                        Perfect fit guaranteed - all buttons and functions work flawlessly.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="orbitron text-4xl md:text-5xl font-bold mb-6 metallic-text">Ready to Experience the Difference?</h2>
+            <p class="text-xl text-gray-300 mb-8">
+                Join the ranks of gamers who demand nothing but the best. Your perfect controller is just a click away.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="inquiry.html" class="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300">
+                    Start Your Customization
+                </a>
+                <a href="index.html" class="border border-teal-400 text-teal-400 hover:bg-teal-400 hover:text-black px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300">
+                    View Portfolio
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <img src="ctrlcraft.png" alt="CtrlCraft Logo" class="h-8 w-8 mr-3">
+                    <span class="orbitron text-lg font-bold metallic-text">CtrlCraft</span>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-gray-400 text-sm">
+                        © 2024 CtrlCraft. Precision Gaming, Perfected.
+                    </p>
+                    <p class="text-gray-500 text-xs mt-1">
+                        Professional controller customization services
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Initialize comparison sliders
+        document.addEventListener('DOMContentLoaded', function() {
+            const sliders = document.querySelectorAll('.comparison-slider');
+            sliders.forEach(slider => {
+                const handle = slider.querySelector('.slider-handle');
+                const after = slider.querySelector('.comparison-after');
+                let isDragging = false;
+
+                handle.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    e.preventDefault();
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    
+                    const rect = slider.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const percentage = (x / rect.width) * 100;
+                    const clampedPercentage = Math.max(0, Math.min(100, percentage));
+                    
+                    after.style.clipPath = `polygon(${clampedPercentage}% 0%, 100% 0%, 100% 100%, ${clampedPercentage}% 100%)`;
+                    handle.style.left = `${clampedPercentage}%`;
+                });
+
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inquiry - CtrlCraft</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
+    <link href="https://unpkg.com/splitting@1.0.6/dist/splitting.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #0a0a0a;
+            color: #ffffff;
+        }
+        .orbitron { font-family: 'Orbitron', monospace; }
+        .jetbrains { font-family: 'JetBrains Mono', monospace; }
+        .metallic-text {
+            background: linear-gradient(135deg, #c0c0c0, #ffffff, #c0c0c0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .form-container {
+            background: linear-gradient(135deg, rgba(45, 45, 45, 0.9), rgba(26, 26, 26, 0.9));
+            border: 1px solid rgba(20, 184, 166, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        .form-input {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            border-color: #14b8a6;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+            outline: none;
+        }
+        .service-option {
+            background: linear-gradient(135deg, rgba(45, 45, 45, 0.9), rgba(26, 26, 26, 0.9));
+            border: 2px solid rgba(75, 85, 99, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .service-option:hover {
+            border-color: rgba(20, 184, 166, 0.5);
+            transform: translateY(-2px);
+        }
+        .service-option.selected {
+            border-color: #14b8a6;
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(59, 130, 246, 0.1));
+        }
+        .file-upload {
+            border: 2px dashed rgba(75, 85, 99, 0.5);
+            transition: all 0.3s ease;
+        }
+        .file-upload:hover {
+            border-color: #14b8a6;
+            background: rgba(20, 184, 166, 0.05);
+        }
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .preview-item {
+            position: relative;
+            background: rgba(45, 45, 45, 0.8);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        .preview-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        .preview-item .file-info {
+            padding: 0.5rem;
+            font-size: 0.75rem;
+        }
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            background: rgba(239, 68, 68, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+        .preview-item .remove-btn:hover {
+            background: rgba(239, 68, 68, 1);
+        }
+        .phone-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-black bg-opacity-90 backdrop-blur-sm z-50 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <img src="ctrlcraft.png" alt="CtrlCraft Logo" class="h-10 w-10 mr-3">
+                        <span class="orbitron text-xl font-bold metallic-text">CtrlCraft</span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="text-gray-300 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">Home</a>
+                        <a href="about.html" class="text-gray-300 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">About</a>
+                        <a href="inquiry.html" class="text-teal-400 px-3 py-2 text-sm font-medium">Inquiry</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-12 bg-gradient-to-br from-gray-900 via-black to-gray-900">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 id="hero-title" class="orbitron text-4xl md:text-6xl font-black mb-6 metallic-text"></h1>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                Tell us about your dream controller and we'll bring it to life with our precision craftsmanship
+            </p>
+        </div>
+    </section>
+
+    <!-- Inquiry Form -->
+    <section class="py-20 bg-black">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="form-container rounded-2xl p-8 md:p-12 scroll-reveal">
+                <form id="inquiry-form" class="space-y-8">
+                    <!-- Service Selection -->
+                    <div>
+                        <h3 class="orbitron text-2xl font-bold mb-6 text-center">Choose Your Service</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="service-option p-6 rounded-xl" data-service="custom-painting">
+                                <div class="text-4xl mb-4 text-center">🎨</div>
+                                <h4 class="orbitron text-lg font-bold mb-2 text-center">Custom Painting</h4>
+                                <p class="text-sm text-gray-400 text-center">Automotive-grade paints & professional finish</p>
+                            </div>
+                            <div class="service-option p-6 rounded-xl" data-service="vacuum-metallizing">
+                                <div class="text-4xl mb-4 text-center">✨</div>
+                                <h4 class="orbitron text-lg font-bold mb-2 text-center">Vacuum Metallizing</h4>
+                                <p class="text-sm text-gray-400 text-center">Mirror-like metallic finishes</p>
+                            </div>
+                            <div class="service-option p-6 rounded-xl" data-service="pvd-coating">
+                                <div class="text-4xl mb-4 text-center">🔬</div>
+                                <h4 class="orbitron text-lg font-bold mb-2 text-center">PVD Coating</h4>
+                                <p class="text-sm text-gray-400 text-center">Extreme durability & unique effects</p>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selected-service" name="service" required>
+                    </div>
+
+                    <!-- Personal Information -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Full Name *</label>
+                            <input type="text" id="name" name="name" required 
+                                   class="form-input w-full px-4 py-3 rounded-lg" 
+                                   placeholder="Your full name">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email Address *</label>
+                            <input type="email" id="email" name="email" required 
+                                   class="form-input w-full px-4 py-3 rounded-lg" 
+                                   placeholder="your.email@example.com">
+                        </div>
+                    </div>
+
+                    <!-- Phone Number - Centered -->
+                    <div class="phone-center">
+                        <div class="w-full md:w-1/2">
+                            <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" 
+                                   class="form-input w-full px-4 py-3 rounded-lg" 
+                                   placeholder="Your phone number (optional)">
+                        </div>
+                    </div>
+
+                    <!-- Controller Details -->
+                    <div>
+                        <label for="controller-type" class="block text-sm font-medium text-gray-300 mb-2">Controller Type</label>
+                        <select id="controller-type" name="controller-type" 
+                                class="form-input w-full px-4 py-3 rounded-lg">
+                            <option value="">Select controller type</option>
+                            <option value="xbox-series-x">Xbox Series X/S</option>
+                            <option value="xbox-one">Xbox One</option>
+                            <option value="ps5">PlayStation 5</option>
+                            <option value="ps4">PlayStation 4</option>
+                            <option value="nintendo-switch">Nintendo Switch Pro</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Design Details -->
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-300 mb-2">Design Details *</label>
+                        <textarea id="message" name="message" rows="6" required 
+                                  class="form-input w-full px-4 py-3 rounded-lg resize-none" 
+                                  placeholder="Describe your dream controller design, colors, patterns, themes, or any specific requirements..."></textarea>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Reference Images (Optional)</label>
+                        <div class="file-upload rounded-lg p-6 text-center">
+                            <input type="file" id="inspiration-upload" name="inspiration" multiple 
+                                   accept="image/*" class="hidden">
+                            <button type="button" onclick="document.getElementById('inspiration-upload').click()" 
+                                    class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg transition-colors">
+                                Choose Files
+                            </button>
+                            <p class="text-sm text-gray-400 mt-2">Upload inspiration images or reference photos</p>
+                            <div id="image-preview" class="image-preview mt-4">
+                                <p class="text-gray-400 text-sm text-center">No files selected</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div>
+                        <label for="timeline" class="block text-sm font-medium text-gray-300 mb-2">Desired Timeline</label>
+                        <select id="timeline" name="timeline" 
+                                class="form-input w-full px-4 py-3 rounded-lg">
+                            <option value="">Select timeline</option>
+                            <option value="1-2-weeks">1-2 weeks (Normal timing - no additional cost)</option>
+                            <option value="asap">ASAP (Rush order + additional cost)</option>
+                        </select>
+                    </div>
+
+                    <!-- Shipping Notice -->
+                    <div class="bg-gray-800 border border-teal-600 rounded-lg p-6">
+                        <h3 class="orbitron text-lg font-bold mb-4 text-teal-400">📍 Shipping Information</h3>
+                        <p class="text-gray-300 mb-4">
+                            All controllers must be shipped or delivered to our workshop location. Please confirm you understand this requirement.
+                        </p>
+                        <div class="bg-teal-900 bg-opacity-30 border border-teal-500 rounded-lg p-4 mb-4">
+                            <p class="font-bold text-teal-300">40 Ben Lomond Crest, Pakuranga, Auckland</p>
+                            <p class="text-sm text-gray-400 mt-1">⚠️ At customer's expense</p>
+                        </div>
+                        <div class="flex items-start">
+                            <input type="checkbox" id="shipping-confirm" name="shipping-confirm" required 
+                                   class="mt-1 mr-3 h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
+                            <label for="shipping-confirm" class="text-sm text-gray-300">
+                                I understand and agree that controllers must be shipped or delivered to 40 Ben Lomond Crest, Pakuranga, Auckland at my own expense. *
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button type="submit" 
+                                class="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105">
+                            Send Inquiry
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-400">&copy; 2024 CtrlCraft. Precision Gaming, Perfected.</p>
+        </div>
+    </footer>
+
+    <!-- Email Handler Script -->
+    <script src="email-handler-fixed.js"></script>
+    
+    <!-- Main JavaScript -->
+    <script src="main.js"></script>
+</body>
+</html>
