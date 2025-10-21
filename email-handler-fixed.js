@@ -218,8 +218,6 @@ class EmailHandler {
                 timeline: data.timeline || 'Not specified',
                 message: data.message.trim(),
                 image_html: imageHtml,
-                image_text: imageText,
-                image_count: this.collectedImages.length.toString(),
                 reply_to: data.email.trim()
             };
             
