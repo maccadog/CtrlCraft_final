@@ -93,6 +93,13 @@
             border-color: #14b8a6;
             background: rgba(20, 184, 166, 0.05);
         }
+        .fade-in {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .fade-in.visible {
+            opacity: 1;
+        }
         .scroll-reveal {
             opacity: 0;
             transform: translateY(30px);
@@ -163,14 +170,16 @@
         }
     </style>
 </head>
-<body>
+<body class="fade-in">
     <!-- Navigation -->
     <nav class="fixed top-0 w-full bg-black bg-opacity-90 backdrop-blur-sm z-50 border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <a href="index.html" class="flex items-center">
-                        <img src="ctrlcraft.png" alt="CtrlCraft Logo" class="h-10 w-10 mr-3">
+                        <div class="h-10 w-10 mr-3 bg-gradient-to-br from-teal-400 to-blue-500 rounded-lg flex items-center justify-center">
+                            <span class="orbitron text-white font-bold text-lg">C</span>
+                        </div>
                         <span class="orbitron text-xl font-bold metallic-text">CtrlCraft</span>
                     </a>
                 </div>
@@ -195,10 +204,10 @@
     <!-- Hero Section -->
     <section class="pt-24 pb-12 bg-gradient-to-br from-black via-gray-900 to-black">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="orbitron text-5xl font-bold mb-6 metallic-text scroll-reveal">
+            <h1 class="orbitron text-5xl font-bold mb-6 metallic-text">
                 Custom Controller Inquiry
             </h1>
-            <p class="text-xl text-gray-300 mb-8 scroll-reveal">
+            <p class="text-xl text-gray-300 mb-8">
                 Transform your gaming experience with our premium custom controllers
             </p>
         </div>
@@ -207,7 +216,7 @@
     <!-- Inquiry Form -->
     <section class="py-16 bg-gray-900">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="form-container rounded-2xl p-8 scroll-reveal">
+            <div class="form-container rounded-2xl p-8">
                 <form id="inquiry-form" class="space-y-8">
                     <!-- Personal Information -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -427,6 +436,22 @@
                                   placeholder="Any additional information, special requirements, or questions..."></textarea>
                     </div>
 
+                    <!-- Shipping Requirement Checkbox -->
+                    <div class="bg-red-900 bg-opacity-20 border border-red-500 rounded-lg p-6">
+                        <div class="flex items-start space-x-3">
+                            <input type="checkbox" id="shipping-requirement" name="shipping_requirement" required 
+                                   class="mt-1 h-5 w-5 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
+                            <div class="flex-1">
+                                <label for="shipping-requirement" class="text-sm font-medium text-red-300 block">
+                                    I understand that my controller must be shipped or delivered to 40 Ben Lomond Crest, Pakuranga, Auckland at my expense. *
+                                </label>
+                                <p class="text-xs text-red-400 mt-2">
+                                    This is a required condition for all custom controller services. You are responsible for all shipping costs to our workshop location.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Submit Button -->
                     <div class="text-center">
                         <button type="submit" id="submit-btn" 
@@ -444,7 +469,9 @@
     <footer class="bg-black py-12 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div class="flex items-center justify-center mb-4">
-                <img src="ctrlcraft.png" alt="CtrlCraft Logo" class="h-8 w-8 mr-2">
+                <div class="h-8 w-8 mr-2 bg-gradient-to-br from-teal-400 to-blue-500 rounded-lg flex items-center justify-center">
+                    <span class="orbitron text-white font-bold text-sm">C</span>
+                </div>
                 <span class="orbitron text-xl font-bold metallic-text">CtrlCraft</span>
             </div>
             <p class="text-gray-400 text-sm">
@@ -460,6 +487,15 @@
     <script>
         // Initialize color selection functionality
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize EmailJS with a placeholder - users need to replace this with their actual key
+            try {
+                emailjs.init("YOUR_PUBLIC_KEY_HERE"); // Replace with your actual EmailJS public key
+            } catch (error) {
+                console.warn('EmailJS initialization failed. Please configure your EmailJS credentials.');
+            }
+            
+            // Make page fade in immediately
+            document.body.classList.add('visible');
             
             const controllerOptions = document.querySelectorAll('.service-option[data-controller]');
             const serviceOptions = document.querySelectorAll('.service-option[data-service]');
@@ -531,6 +567,50 @@
             // Form submission handler for color data
             const form = document.getElementById('inquiry-form');
             form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+                
+                // Check if shipping requirement checkbox is checked
+                const shippingCheckbox = document.getElementById('shipping-requirement');
+                if (!shippingCheckbox.checked) {
+                    alert('Please check the shipping requirement checkbox to proceed. You must agree to ship or deliver your controller to 40 Ben Lomond Crest, Pakuranga, Auckland at your expense.');
+                    return;
+                }
+
+                // Validate required fields
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+                let emptyFields = [];
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.classList.add('border-red-500');
+                        isValid = false;
+                        // Get field label for error message
+                        const label = field.previousElementSibling;
+                        if (label && label.tagName === 'LABEL') {
+                            emptyFields.push(label.textContent.replace(' *', ''));
+                        }
+                    } else {
+                        field.classList.remove('border-red-500');
+                    }
+                });
+
+                if (!isValid) {
+                    alert('Please fill in all required fields and confirm shipping requirements. Missing fields: ' + emptyFields.join(', '));
+                    return;
+                }
+
+                // Validate controller and service selection
+                if (!selectedControllerInput.value) {
+                    alert('Please select a controller type.');
+                    return;
+                }
+
+                if (!selectedServiceInput.value) {
+                    alert('Please select a service type.');
+                    return;
+                }
+
                 const service = selectedServiceInput.value;
                 let colorData = '';
 
@@ -552,7 +632,85 @@
                     colorInput.value = colorData;
                     form.appendChild(colorInput);
                 }
+
+                // Show loading state
+                const submitBtn = document.getElementById('submit-btn');
+                const submitText = document.getElementById('submit-text');
+                const submitLoading = document.getElementById('submit-loading');
+                
+                submitBtn.disabled = true;
+                submitText.classList.add('hidden');
+                submitLoading.classList.remove('hidden');
+
+                // Check if EmailJS is properly configured
+                if (typeof emailjs !== 'undefined' && emailjs.sendForm) {
+                    // Send form via EmailJS
+                    emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', form)
+                        .then(function(response) {
+                            alert('Thank you for your inquiry! We will contact you within 24 hours to discuss your custom controller project.');
+                            form.reset();
+                            
+                            // Reset form state
+                            document.querySelectorAll('.service-option').forEach(opt => opt.classList.remove('selected'));
+                            document.querySelectorAll('.color-options-container').forEach(container => container.classList.remove('active'));
+                            document.getElementById('image-preview').innerHTML = '';
+                            
+                            // Reset hidden inputs
+                            selectedControllerInput.value = '';
+                            selectedServiceInput.value = '';
+                            document.getElementById('selected-paint-color').value = '';
+                            document.getElementById('selected-metallic-color').value = '';
+                            
+                        }, function(error) {
+                            alert('Sorry, there was an error sending your inquiry. Please try again or contact us directly.');
+                            console.error('EmailJS error:', error);
+                        })
+                        .finally(function() {
+                            // Reset button state
+                            submitBtn.disabled = false;
+                            submitText.classList.remove('hidden');
+                            submitLoading.classList.add('hidden');
+                        });
+                } else {
+                    // Fallback for when EmailJS is not configured
+                    alert('Form validation successful! Please configure EmailJS credentials to enable email sending. Your form data is ready to submit.');
+                    
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    submitText.classList.remove('hidden');
+                    submitLoading.classList.add('hidden');
+                }
             });
+
+            // Scroll reveal animation (excluding inquiry form)
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            // Apply scroll reveal to elements except the inquiry form
+            document.querySelectorAll('.scroll-reveal').forEach(el => {
+                // Skip the inquiry form container
+                if (!el.classList.contains('form-container')) {
+                    observer.observe(el);
+                }
+            });
+
+            // Mobile menu functionality
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    alert('Mobile menu clicked!');
+                });
+            }
         });
     </script>
 </body>
