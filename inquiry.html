@@ -168,6 +168,15 @@
             font-weight: bold;
             color: #14b8a6;
         }
+        .validation-error {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 <body class="fade-in">
@@ -269,7 +278,7 @@
                                 <div class="text-xs text-gray-400">Switch Pro/Joy-Con</div>
                             </div>
                         </div>
-                        <input type="hidden" id="selected-controller" name="controller_type" required>
+                        <input type="hidden" id="selected-controller" name="controller_type">
                     </div>
 
                     <!-- Service Selection -->
@@ -295,12 +304,12 @@
                                 <div class="price-tag">EST $60</div>
                             </div>
                         </div>
-                        <input type="hidden" id="selected-service" name="service_type" required>
+                        <input type="hidden" id="selected-service" name="service_type">
                     </div>
 
                     <!-- Color Options for Custom Painting -->
                     <div id="painting-colors" class="color-options-container">
-                        <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Paint Color</label>
+                        <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Paint Color *</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
                             <div class="color-option p-3 rounded-lg text-center" data-color="Crimson Red">
                                 <div class="color-preview" style="background: #dc143c;"></div>
@@ -354,7 +363,7 @@
 
                     <!-- Metallic Color Options for Vacuum Metalizing -->
                     <div id="metallizing-colors" class="color-options-container">
-                        <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Metallic Finish</label>
+                        <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Metallic Finish *</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
                             <div class="color-option p-3 rounded-lg text-center" data-color="Chrome Silver">
                                 <div class="color-preview metallic-finish" style="background: linear-gradient(45deg, #c0c0c0, #ffffff, #c0c0c0);"></div>
@@ -420,8 +429,8 @@
 
                     <!-- Timeline -->
                     <div>
-                        <label for="timeline" class="block text-sm font-medium text-gray-300 mb-2">Desired Timeline</label>
-                        <select id="timeline" name="timeline" class="form-input w-full px-4 py-3 rounded-lg">
+                        <label for="timeline" class="block text-sm font-medium text-gray-300 mb-2">Desired Timeline *</label>
+                        <select id="timeline" name="timeline" required class="form-input w-full px-4 py-3 rounded-lg">
                             <option value="">Select timeline</option>
                             <option value="1-2weeks">1-2 weeks (No additional charge)</option>
                             <option value="asap">ASAP (Additional fees apply)</option>
@@ -569,63 +578,111 @@
             form.addEventListener('submit', function(e) {
                 e.preventDefault(); // Prevent default form submission
                 
+                // Clear previous errors
+                document.querySelectorAll('.validation-error').forEach(el => {
+                    el.classList.remove('validation-error');
+                });
+                document.querySelectorAll('.error-message').forEach(el => {
+                    el.remove();
+                });
+
+                let isValid = true;
+                let errorMessages = [];
+
                 // Check if shipping requirement checkbox is checked
                 const shippingCheckbox = document.getElementById('shipping-requirement');
                 if (!shippingCheckbox.checked) {
-                    alert('Please check the shipping requirement checkbox to proceed. You must agree to ship or deliver your controller to 40 Ben Lomond Crest, Pakuranga, Auckland at your expense.');
-                    return;
+                    isValid = false;
+                    errorMessages.push('Please check the shipping requirement checkbox to proceed.');
+                    shippingCheckbox.classList.add('validation-error');
                 }
 
-                // Validate required fields
-                const requiredFields = form.querySelectorAll('[required]');
-                let isValid = true;
-                let emptyFields = [];
-                
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        field.classList.add('border-red-500');
+                // Validate required text fields
+                const requiredTextFields = [
+                    { id: 'first-name', name: 'First Name' },
+                    { id: 'last-name', name: 'Last Name' },
+                    { id: 'email', name: 'Email Address' },
+                    { id: 'design-description', name: 'Design Description' }
+                ];
+
+                requiredTextFields.forEach(field => {
+                    const element = document.getElementById(field.id);
+                    if (!element.value.trim()) {
                         isValid = false;
-                        // Get field label for error message
-                        const label = field.previousElementSibling;
-                        if (label && label.tagName === 'LABEL') {
-                            emptyFields.push(label.textContent.replace(' *', ''));
-                        }
-                    } else {
-                        field.classList.remove('border-red-500');
+                        errorMessages.push(`${field.name} is required.`);
+                        element.classList.add('validation-error');
                     }
                 });
 
-                if (!isValid) {
-                    alert('Please fill in all required fields and confirm shipping requirements. Missing fields: ' + emptyFields.join(', '));
-                    return;
+                // Validate timeline selection
+                const timeline = document.getElementById('timeline');
+                if (!timeline.value) {
+                    isValid = false;
+                    errorMessages.push('Please select a timeline.');
+                    timeline.classList.add('validation-error');
                 }
 
-                // Validate controller and service selection
+                // Validate controller selection
                 if (!selectedControllerInput.value) {
-                    alert('Please select a controller type.');
-                    return;
+                    isValid = false;
+                    errorMessages.push('Please select a controller type.');
+                    // Add visual error to controller section
+                    const controllerSection = document.querySelector('[data-controller]')?.parentElement;
+                    if (controllerSection) {
+                        controllerSection.style.border = '2px solid #ef4444';
+                    }
                 }
 
+                // Validate service selection
                 if (!selectedServiceInput.value) {
-                    alert('Please select a service type.');
-                    return;
+                    isValid = false;
+                    errorMessages.push('Please select a service type.');
+                    // Add visual error to service section
+                    const serviceSection = document.querySelector('[data-service]')?.parentElement;
+                    if (serviceSection) {
+                        serviceSection.style.border = '2px solid #ef4444';
+                    }
                 }
 
+                // Validate color selection based on service type
                 const service = selectedServiceInput.value;
                 let colorData = '';
+                let hasColor = false;
 
                 if (service === 'custom-painting') {
                     const selectedColor = document.getElementById('selected-paint-color').value;
                     const customColor = document.getElementById('custom-paint-color').value;
-                    colorData = selectedColor || customColor || 'Not specified';
+                    colorData = selectedColor || customColor || '';
+                    if (!colorData) {
+                        isValid = false;
+                        errorMessages.push('Please select a paint color or enter a custom color.');
+                    } else {
+                        hasColor = true;
+                    }
                 } else if (service === 'vacuum-metallizing') {
                     const selectedColor = document.getElementById('selected-metallic-color').value;
                     const customColor = document.getElementById('custom-metallic-color').value;
-                    colorData = selectedColor || customColor || 'Not specified';
+                    colorData = selectedColor || customColor || '';
+                    if (!colorData) {
+                        isValid = false;
+                        errorMessages.push('Please select a metallic finish or enter a custom finish.');
+                    } else {
+                        hasColor = true;
+                    }
+                } else if (service === 'custom-design') {
+                    // Custom design doesn't require color selection
+                    hasColor = true;
+                    colorData = 'Custom Design - No specific color required';
+                }
+
+                if (!isValid) {
+                    // Show all error messages
+                    alert('Please fix the following issues:\n\n' + errorMessages.join('\n'));
+                    return;
                 }
 
                 // Add color data to form submission
-                if (colorData) {
+                if (colorData && hasColor) {
                     const colorInput = document.createElement('input');
                     colorInput.type = 'hidden';
                     colorInput.name = 'color_choice';
@@ -641,6 +698,13 @@
                 submitBtn.disabled = true;
                 submitText.classList.add('hidden');
                 submitLoading.classList.remove('hidden');
+
+                // Collect all form data for debugging
+                const formData = new FormData(form);
+                console.log('Form data being sent:');
+                for (let [key, value] of formData.entries()) {
+                    console.log(key + ': ' + value);
+                }
 
                 // Check if EmailJS is properly configured
                 if (typeof emailjs !== 'undefined' && emailjs.sendForm) {
@@ -672,8 +736,15 @@
                             submitLoading.classList.add('hidden');
                         });
                 } else {
-                    // Fallback for when EmailJS is not configured
-                    alert('Form validation successful! Please configure EmailJS credentials to enable email sending. Your form data is ready to submit.');
+                    // Fallback for when EmailJS is not configured - show success message with form data
+                    const formData = new FormData(form);
+                    let formSummary = 'Form validation successful! Here is your inquiry data:\n\n';
+                    for (let [key, value] of formData.entries()) {
+                        formSummary += `${key}: ${value}\n`;
+                    }
+                    formSummary += '\nPlease configure EmailJS credentials to enable email sending.';
+                    
+                    alert(formSummary);
                     
                     // Reset button state
                     submitBtn.disabled = false;
