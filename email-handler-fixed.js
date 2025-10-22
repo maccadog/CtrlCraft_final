@@ -1,4 +1,4 @@
-// Email Handler for CtrlCraft - FIXED VERSION with Correct Field Mapping
+// Email Handler for CtrlCraft - INTEGRATED VERSION with Enhanced Functionality
 class EmailHandler {
     constructor() {
         // EmailJS Configuration
@@ -326,10 +326,15 @@ class EmailHandler {
         this.uploadedFiles.clear();
         
         // Reset hidden inputs
-        document.getElementById('selected-controller').value = '';
-        document.getElementById('selected-service').value = '';
-        document.getElementById('selected-paint-color').value = '';
-        document.getElementById('selected-metallic-color').value = '';
+        const selectedController = document.getElementById('selected-controller');
+        const selectedService = document.getElementById('selected-service');
+        const selectedPaintColor = document.getElementById('selected-paint-color');
+        const selectedMetallicColor = document.getElementById('selected-metallic-color');
+        
+        if (selectedController) selectedController.value = '';
+        if (selectedService) selectedService.value = '';
+        if (selectedPaintColor) selectedPaintColor.value = '';
+        if (selectedMetallicColor) selectedMetallicColor.value = '';
         
         // Reset visual selections
         document.querySelectorAll('.service-option').forEach(opt => {
@@ -365,5 +370,82 @@ class EmailHandler {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Make page fade in immediately
+    document.body.classList.add('visible');
+    
+    // Initialize email handler
     new EmailHandler();
+    
+    // Initialize form interactions
+    const selectedControllerInput = document.getElementById('selected-controller');
+    const selectedServiceInput = document.getElementById('selected-service');
+
+    // Controller selection handlers
+    document.querySelectorAll('.service-option[data-controller]').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.service-option[data-controller]').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            this.classList.add('selected');
+            if (selectedControllerInput) {
+                selectedControllerInput.value = this.dataset.controller;
+            }
+            console.log('Controller selected:', this.dataset.controller);
+        });
+    });
+
+    // Service selection handlers
+    document.querySelectorAll('.service-option[data-service]').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.service-option[data-service]').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            this.classList.add('selected');
+            if (selectedServiceInput) {
+                selectedServiceInput.value = this.dataset.service;
+            }
+            console.log('Service selected:', this.dataset.service);
+
+            // Show/hide color options based on service
+            const paintingColors = document.getElementById('painting-colors');
+            const metallizingColors = document.getElementById('metallizing-colors');
+            
+            if (paintingColors) paintingColors.classList.remove('active');
+            if (metallizingColors) metallizingColors.classList.remove('active');
+
+            if (this.dataset.service === 'custom-painting') {
+                setTimeout(() => {
+                    if (paintingColors) paintingColors.classList.add('active');
+                }, 100);
+            } else if (this.dataset.service === 'vacuum-metallizing') {
+                setTimeout(() => {
+                    if (metallizingColors) metallizingColors.classList.add('active');
+                }, 100);
+            }
+        });
+    });
+
+    // Color selection handlers
+    document.querySelectorAll('.color-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const container = this.closest('.color-options-container');
+            const options = container.querySelectorAll('.color-option');
+            
+            options.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            const color = this.getAttribute('data-color');
+            if (container.id === 'painting-colors') {
+                const selectedPaintColor = document.getElementById('selected-paint-color');
+                if (selectedPaintColor) selectedPaintColor.value = color;
+                console.log('Paint color selected:', color);
+            } else if (container.id === 'metallizing-colors') {
+                const selectedMetallicColor = document.getElementById('selected-metallic-color');
+                if (selectedMetallicColor) selectedMetallicColor.value = color;
+                console.log('Metallic color selected:', color);
+            }
+        });
+    });
+
+    console.log('Inquiry form initialized successfully!');
 });
