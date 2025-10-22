@@ -11,6 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
     <style>
+        .service-option.selected               { border-color:#14b8a6; }
+        .service-option:required:invalid       { border-color:#ef4444; }
         body { 
             font-family: 'Inter', sans-serif; 
             background: #0a0a0a;
@@ -88,6 +90,7 @@
             border: 2px dashed rgba(75, 85, 99, 0.5);
             transition: all 0.3s ease;
             position: relative;
+            cursor: pointer;
         }
         .file-upload:hover {
             border-color: #14b8a6;
@@ -123,7 +126,6 @@
             border: 1px solid rgba(75, 85, 99, 0.3);
             transition: all 0.3s ease;
         }
-        
         .preview-item:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(20, 184, 166, 0.2);
@@ -177,6 +179,10 @@
             font-size: 0.875rem;
             margin-top: 0.5rem;
         }
+        .drag-over {
+            border-color: #14b8a6 !important;
+            background: rgba(20, 184, 166, 0.1) !important;
+        }
     </style>
 </head>
 <body class="fade-in">
@@ -196,7 +202,7 @@
                     <div class="ml-10 flex items-baseline space-x-8">
                         <a href="index.html" class="text-gray-300 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">Home</a>
                         <a href="about.html" class="text-gray-300 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">About</a>
-                        <a href="inquiry.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Inquiry</a>
+                        <a href="inquiry-FINAL.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Inquiry</a>
                     </div>
                 </div>
                 <div class="md:hidden">
@@ -261,7 +267,7 @@
                     <!-- Controller Type -->
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-4">Controller Type *</label>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="controller-options">
                             <div class="service-option p-4 rounded-lg text-center" data-controller="playstation">
                                 <div class="text-2xl mb-2">🎮</div>
                                 <div class="font-medium">PlayStation</div>
@@ -278,13 +284,13 @@
                                 <div class="text-xs text-gray-400">Switch Pro/Joy-Con</div>
                             </div>
                         </div>
-                        <input type="hidden" id="selected-controller" name="controller_type">
+                        <input type="hidden" id="selected-controller" name="controller_type" required>
                     </div>
 
                     <!-- Service Selection -->
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-4">Service Type *</label>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="service-options">
                             <div class="service-option p-4 rounded-lg text-center" data-service="custom-painting">
                                 <div class="text-2xl mb-2">🎨</div>
                                 <div class="font-medium">Custom Painting</div>
@@ -304,12 +310,12 @@
                                 <div class="price-tag">EST $60</div>
                             </div>
                         </div>
-                        <input type="hidden" id="selected-service" name="service_type">
+                        <input type="hidden" id="selected-service" name="service_type" required>
                     </div>
-
-                    <!-- Color Options for Custom Painting -->
+                    
+                     Color Options for Custom Painting
                     <div id="painting-colors" class="color-options-container">
-                        <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Paint Color *</label>
+                        <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Paint Color (Optional)</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
                             <div class="color-option p-3 rounded-lg text-center" data-color="Crimson Red">
                                 <div class="color-preview" style="background: #dc143c;"></div>
@@ -360,10 +366,10 @@
                         </div>
                         <input type="hidden" id="selected-paint-color" name="selected_paint_color">
                     </div>
-
-                    <!-- Metallic Color Options for Vacuum Metalizing -->
+                
+                    Metallic Color Options for Vacuum Metalizing
                     <div id="metallizing-colors" class="color-options-container">
-                        <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Metallic Finish *</label>
+                        <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Metallic Finish (Optional)</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
                             <div class="color-option p-3 rounded-lg text-center" data-color="Chrome Silver">
                                 <div class="color-preview metallic-finish" style="background: linear-gradient(45deg, #c0c0c0, #ffffff, #c0c0c0);"></div>
@@ -406,7 +412,7 @@
                         </div>
                         <input type="hidden" id="selected-metallic-color" name="selected_metallic_color">
                     </div>
-
+                    
                     <!-- Design Details -->
                     <div>
                         <label for="design-description" class="block text-sm font-medium text-gray-300 mb-2">Design Description *</label>
@@ -492,297 +498,438 @@
     <!-- Scripts -->
     <script src="https://cdn.emailjs.com/sdk/v3/email.min.js"></script>
     <script src="main.js"></script>
-    <script src="email-handler-fixed.js"></script>
+    
+    <!-- FIXED: Email Handler with Correct Field Mapping -->
     <script>
-        // Initialize color selection functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize EmailJS with a placeholder - users need to replace this with their actual key
-            try {
-                emailjs.init("YOUR_PUBLIC_KEY_HERE"); // Replace with your actual EmailJS public key
-            } catch (error) {
-                console.warn('EmailJS initialization failed. Please configure your EmailJS credentials.');
+    class EmailHandler {
+        constructor() {
+            this.SERVICE_ID = 'service_vh27g2b';
+            this.TEMPLATE_ID = 'template_a957hvd';
+            this.PUBLIC_KEY = 'S0zUDXqxW2Kw0getx';
+            
+            this.collectedImages = [];
+            this.emailjsLoaded = false;
+            this.uploadedFiles = new Set();
+            this.isUploading = false;
+            this.maxImages = 10;
+            this.maxFileSize = 10 * 1024 * 1024;
+            
+            this.init();
+        }
+
+        init() {
+            this.loadEmailJS();
+            this.setupFormHandlers();
+            this.setupImageCollection();
+            this.setupDragAndDrop();
+        }
+
+        loadEmailJS() {
+            if (typeof emailjs !== 'undefined') {
+                this.emailjsLoaded = true;
+                emailjs.init(this.PUBLIC_KEY);
+                console.log('EmailJS initialized');
+                return;
             }
             
-            // Make page fade in immediately
-            document.body.classList.add('visible');
-            
-            const controllerOptions = document.querySelectorAll('.service-option[data-controller]');
-            const serviceOptions = document.querySelectorAll('.service-option[data-service]');
-            const paintingColors = document.getElementById('painting-colors');
-            const metallizingColors = document.getElementById('metallizing-colors');
-            const selectedControllerInput = document.getElementById('selected-controller');
-            const selectedServiceInput = document.getElementById('selected-service');
+            const script = document.createElement('script');
+            script.src = 'https://cdn.emailjs.com/sdk/v3/email.min.js';
+            script.onload = () => {
+                emailjs.init(this.PUBLIC_KEY);
+                this.emailjsLoaded = true;
+            };
+            document.head.appendChild(script);
+        }
 
-            // Color selection handlers
-            function setupColorSelection() {
-                const colorOptions = document.querySelectorAll('.color-option');
-                const selectedPaintColor = document.getElementById('selected-paint-color');
-                const selectedMetallicColor = document.getElementById('selected-metallic-color');
-
-                colorOptions.forEach(option => {
-                    option.addEventListener('click', () => {
-                        const container = option.closest('.color-options-container');
-                        const options = container.querySelectorAll('.color-option');
-                        
-                        options.forEach(opt => opt.classList.remove('selected'));
-                        option.classList.add('selected');
-                        
-                        const color = option.getAttribute('data-color');
-                        if (container.id === 'painting-colors') {
-                            selectedPaintColor.value = color;
-                        } else if (container.id === 'metallizing-colors') {
-                            selectedMetallicColor.value = color;
-                        }
-                    });
-                });
-            }
-
-           /* ----------  NEW UNIFIED CLICK HANDLER (controller + service)  ---------- */
-            document.querySelectorAll('.service-option').forEach(option => {
-            option.addEventListener('click', function () {
-                const isController = this.hasAttribute('data-controller');
-                const isService  = this.hasAttribute('data-service');
-
-                if (isController) {
-                // keep only one controller highlighted
-                document.querySelectorAll('[data-controller]').forEach(el => el.classList.remove('selected'));
-                this.classList.add('selected');
-                document.getElementById('selected-controller').value = this.dataset.controller;
-                }
-
-                if (isService) {
-                // keep only one service highlighted
-                document.querySelectorAll('[data-service]').forEach(el => el.classList.remove('selected'));
-                this.classList.add('selected');
-                document.getElementById('selected-service').value = this.dataset.service;
-
-                /* ----- colour-section toggle (your existing logic) ----- */
-                const paintingColors   = document.getElementById('painting-colors');
-                const metallizingColors = document.getElementById('metallizing-colors');
-                paintingColors.classList.remove('active');
-                metallizingColors.classList.remove('active');
-
-                setTimeout(() => {
-                    if (this.dataset.service === 'custom-painting')      paintingColors.classList.add('active');
-                    if (this.dataset.service === 'vacuum-metallizing')  metallizingColors.classList.add('active');
-                }, 100);
-                }
-            });
-            });
-
-            // Setup color selection
-            setupColorSelection();
-
-            // Form submission handler for color data
+        setupFormHandlers() {
             const form = document.getElementById('inquiry-form');
-            form.addEventListener('submit', function(e) {
-                e.preventDefault(); // Prevent default form submission
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleSubmission(form);
+                });
+            }
+        }
+
+        async handleSubmission(form) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            
+            try {
+                if (!this.emailjsLoaded) {
+                    throw new Error('Email service not ready. Please wait and try again.');
+                }
                 
-                // Clear previous errors
-                document.querySelectorAll('.validation-error').forEach(el => {
-                    el.classList.remove('validation-error');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending...';
+                
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                
+                console.log('Form data collected:', data);
+                
+                // FIXED: Correct field name validation
+                if (!data.first_name || !data.last_name || !data.email || !data.design_description || 
+                    !data.controller_type || !data.service_type || !data.shipping_requirement) {
+                    let missing = [];
+                    if (!data.first_name) missing.push('First Name');
+                    if (!data.last_name) missing.push('Last Name');
+                    if (!data.email) missing.push('Email');
+                    if (!data.design_description) missing.push('Design Description');
+                    if (!data.controller_type) missing.push('Controller Type');
+                    if (!data.service_type) missing.push('Service Type');
+                    if (!data.shipping_requirement) missing.push('Shipping Agreement');
+                    
+                    throw new Error(`Please complete: ${missing.join(', ')}`);
+                }
+                
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(data.email)) {
+                    throw new Error('Please enter a valid email address');
+                }
+                
+                // Prepare color information
+                let colorInfo = 'No specific color selected';
+                if (data.selected_paint_color) {
+                    colorInfo = `Paint Color: ${data.selected_paint_color}`;
+                    if (data.custom_paint_color) {
+                        colorInfo += ` (${data.custom_paint_color})`;
+                    }
+                } else if (data.selected_metallic_color) {
+                    colorInfo = `Metallic Finish: ${data.selected_metallic_color}`;
+                    if (data.custom_metallic_color) {
+                        colorInfo += ` (${data.custom_metallic_color})`;
+                    }
+                } else if (data.custom_paint_color || data.custom_metallic_color) {
+                    colorInfo = `Custom: ${data.custom_paint_color || data.custom_metallic_color}`;
+                }
+                
+                // Prepare image data
+                let imageHtml = '<p><strong>No images uploaded</strong></p>';
+                let imageText = 'No images uploaded';
+                
+                if (this.collectedImages.length > 0) {
+                    imageHtml = '<div style="margin: 20px 0;"><h3>Reference Images:</h3>';
+                    imageText = 'Reference Images:\n';
+                    
+                    this.collectedImages.forEach((img, index) => {
+                        imageHtml += `
+                            <div style="display: inline-block; margin: 10px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                                <img src="${img.data}" alt="${img.name}" style="max-width: 200px; max-height: 200px; display: block; margin-bottom: 5px;">
+                                <p style="font-size: 12px; margin: 0; text-align: center;"><strong>Image ${index + 1}:</strong> ${img.name}</p>
+                                <p style="font-size: 11px; margin: 0; text-align: center; color: #666;">Size: ${(img.size / 1024 / 1024).toFixed(2)} MB</p>
+                            </div>
+                        `;
+                        imageText += `Image ${index + 1}: ${img.name} (${(img.size / 1024 / 1024).toFixed(2)} MB)\n`;
+                    });
+                    
+                    imageHtml += '</div>';
+                }
+                
+                const emailParams = {
+                    to_email: 'mackenzie5688@gmail.com',
+                    from_name: `${data.first_name} ${data.last_name}`.trim(),
+                    from_email: data.email.trim(),
+                    phone: data.phone || 'Not provided',
+                    service_type: data.service_type,
+                    controller_type: data.controller_type,
+                    timeline: data.timeline,
+                    color_choice: colorInfo,
+                    message: data.design_description.trim(),
+                    additional_notes: data.additional_notes || 'None',
+                    image_html: imageHtml.trim(),
+                    image_text: imageText.trim(),
+                    image_count: this.collectedImages.length.toString(),
+                    reply_to: data.email.trim()
+                };
+                
+                console.log('Sending email with params:', emailParams);
+                
+                const response = await emailjs.send(
+                    this.SERVICE_ID,
+                    this.TEMPLATE_ID,
+                    emailParams
+                );
+                
+                if (response.status === 200 || response.text === 'OK') {
+                    this.showNotification('Inquiry sent successfully! I\'ll contact you soon.', 'success');
+                    form.reset();
+                    this.resetForm();
+                    
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 3000);
+                } else {
+                    throw new Error(`Failed to send email: ${response.text || 'Unknown error'}`);
+                }
+                
+            } catch (error) {
+                console.error('Email sending error:', error);
+                this.showNotification(error.message || 'Failed to send inquiry. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        }
+
+        setupImageCollection() {
+            const fileInput = document.getElementById('inspiration-upload');
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    this.handleFileUpload(e.target.files);
                 });
-                document.querySelectorAll('.error-message').forEach(el => {
-                    el.remove();
-                });
+            }
+        }
 
-                let isValid = true;
-                let errorMessages = [];
+        setupDragAndDrop() {
+            const uploadArea = document.querySelector('.file-upload');
+            if (!uploadArea) return;
 
-                // Check if shipping requirement checkbox is checked
-                const shippingCheckbox = document.getElementById('shipping-requirement');
-                if (!shippingCheckbox.checked) {
-                    isValid = false;
-                    errorMessages.push('Please check the shipping requirement checkbox to proceed.');
-                    shippingCheckbox.classList.add('validation-error');
-                }
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, this.preventDefaults, false);
+            });
 
-                // Validate required text fields
-                const requiredTextFields = [
-                    { id: 'first-name', name: 'First Name' },
-                    { id: 'last-name', name: 'Last Name' },
-                    { id: 'email', name: 'Email Address' },
-                    { id: 'design-description', name: 'Design Description' }
-                ];
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => uploadArea.classList.add('drag-over'), false);
+            });
 
-                requiredTextFields.forEach(field => {
-                    const element = document.getElementById(field.id);
-                    if (!element.value.trim()) {
-                        isValid = false;
-                        errorMessages.push(`${field.name} is required.`);
-                        element.classList.add('validation-error');
-                    }
-                });
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('drag-over'), false);
+            });
 
-                // Validate timeline selection
-                const timeline = document.getElementById('timeline');
-                if (!timeline.value) {
-                    isValid = false;
-                    errorMessages.push('Please select a timeline.');
-                    timeline.classList.add('validation-error');
-                }
+            uploadArea.addEventListener('drop', (e) => {
+                const files = e.dataTransfer.files;
+                this.handleFileUpload(files);
+            }, false);
 
-                // Validate controller selection
-                if (!selectedControllerInput.value) {
-                    isValid = false;
-                    errorMessages.push('Please select a controller type.');
-                    // Add visual error to controller section
-                    const controllerSection = document.querySelector('[data-controller]')?.parentElement;
-                    if (controllerSection) {
-                        controllerSection.style.border = '2px solid #ef4444';
-                    }
-                }
+            // Click to upload
+            uploadArea.addEventListener('click', () => {
+                document.getElementById('inspiration-upload').click();
+            });
+        }
 
-                // Validate service selection
-                if (!selectedServiceInput.value) {
-                    isValid = false;
-                    errorMessages.push('Please select a service type.');
-                    // Add visual error to service section
-                    const serviceSection = document.querySelector('[data-service]')?.parentElement;
-                    if (serviceSection) {
-                        serviceSection.style.border = '2px solid #ef4444';
-                    }
-                }
+        preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
-                // Validate color selection based on service type
-                const service = selectedServiceInput.value;
-                let colorData = '';
-                let hasColor = false;
+        handleFileUpload(files) {
+            if (this.isUploading) {
+                console.log('Upload already in progress, skipping...');
+                return;
+            }
+            
+            this.isUploading = true;
+            const imagePreview = document.getElementById('image-preview');
+            if (!imagePreview) {
+                this.isUploading = false;
+                return;
+            }
 
-                if (service === 'custom-painting') {
-                    const selectedColor = document.getElementById('selected-paint-color').value;
-                    const customColor = document.getElementById('custom-paint-color').value;
-                    colorData = selectedColor || customColor || '';
-                    if (!colorData) {
-                        isValid = false;
-                        errorMessages.push('Please select a paint color or enter a custom color.');
-                    } else {
-                        hasColor = true;
-                    }
-                } else if (service === 'vacuum-metallizing') {
-                    const selectedColor = document.getElementById('selected-metallic-color').value;
-                    const customColor = document.getElementById('custom-metallic-color').value;
-                    colorData = selectedColor || customColor || '';
-                    if (!colorData) {
-                        isValid = false;
-                        errorMessages.push('Please select a metallic finish or enter a custom finish.');
-                    } else {
-                        hasColor = true;
-                    }
-                } else if (service === 'custom-design') {
-                    // Custom design doesn't require color selection
-                    hasColor = true;
-                    colorData = 'Custom Design - No specific color required';
-                }
+            const fileArray = Array.from(files);
+            const imageFiles = fileArray.filter(file => file.type.startsWith('image/'));
+            
+            if (imageFiles.length === 0) {
+                this.showNotification('Please select valid image files.', 'error');
+                this.isUploading = false;
+                return;
+            }
 
-                if (!isValid) {
-                    // Show all error messages
-                    alert('Please fix the following issues:\n\n' + errorMessages.join('\n'));
+            if (this.collectedImages.length + imageFiles.length > this.maxImages) {
+                this.showNotification(`Maximum ${this.maxImages} images allowed.`, 'error');
+                this.isUploading = false;
+                return;
+            }
+
+            imageFiles.forEach(file => {
+                if (file.size > this.maxFileSize) {
+                    this.showNotification(`File ${file.name} is too large. Maximum 10MB allowed.`, 'error');
                     return;
                 }
 
-                // Add color data to form submission
-                if (colorData && hasColor) {
-                    const colorInput = document.createElement('input');
-                    colorInput.type = 'hidden';
-                    colorInput.name = 'color_choice';
-                    colorInput.value = colorData;
-                    form.appendChild(colorInput);
-                }
-
-                // Show loading state
-                const submitBtn = document.getElementById('submit-btn');
-                const submitText = document.getElementById('submit-text');
-                const submitLoading = document.getElementById('submit-loading');
-                
-                submitBtn.disabled = true;
-                submitText.classList.add('hidden');
-                submitLoading.classList.remove('hidden');
-
-                // Collect all form data for debugging
-                const formData = new FormData(form);
-                console.log('Form data being sent:');
-                for (let [key, value] of formData.entries()) {
-                    console.log(key + ': ' + value);
-                }
-
-                // Check if EmailJS is properly configured
-                if (typeof emailjs !== 'undefined' && emailjs.sendForm) {
-                    // Send form via EmailJS
-                    emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', form)
-                        .then(function(response) {
-                            alert('Thank you for your inquiry! We will contact you within 24 hours to discuss your custom controller project.');
-                            form.reset();
-                            
-                            // Reset form state
-                            document.querySelectorAll('.service-option').forEach(opt => opt.classList.remove('selected'));
-                            document.querySelectorAll('.color-options-container').forEach(container => container.classList.remove('active'));
-                            document.getElementById('image-preview').innerHTML = '';
-                            
-                            // Reset hidden inputs
-                            selectedControllerInput.value = '';
-                            selectedServiceInput.value = '';
-                            document.getElementById('selected-paint-color').value = '';
-                            document.getElementById('selected-metallic-color').value = '';
-                            
-                        }, function(error) {
-                            alert('Sorry, there was an error sending your inquiry. Please try again or contact us directly.');
-                            console.error('EmailJS error:', error);
-                        })
-                        .finally(function() {
-                            // Reset button state
-                            submitBtn.disabled = false;
-                            submitText.classList.remove('hidden');
-                            submitLoading.classList.add('hidden');
-                        });
-                } else {
-                    // Fallback for when EmailJS is not configured - show success message with form data
-                    const formData = new FormData(form);
-                    let formSummary = 'Form validation successful! Here is your inquiry data:\n\n';
-                    for (let [key, value] of formData.entries()) {
-                        formSummary += `${key}: ${value}\n`;
-                    }
-                    formSummary += '\nPlease configure EmailJS credentials to enable email sending.';
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageData = {
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        data: e.target.result,
+                        lastModified: file.lastModified
+                    };
                     
-                    alert(formSummary);
-                    
-                    // Reset button state
-                    submitBtn.disabled = false;
-                    submitText.classList.remove('hidden');
-                    submitLoading.classList.add('hidden');
-                }
+                    this.collectedImages.push(imageData);
+                    this.createImagePreview(imageData, e.target.result, this.collectedImages.length - 1);
+                };
+                reader.readAsDataURL(file);
             });
+            
+            this.isUploading = false;
+        }
 
-            // Scroll reveal animation (excluding inquiry form)
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                    }
-                });
-            }, observerOptions);
-
-            // Apply scroll reveal to elements except the inquiry form
-            document.querySelectorAll('.scroll-reveal').forEach(el => {
-                // Skip the inquiry form container
-                if (!el.classList.contains('form-container')) {
-                    observer.observe(el);
-                }
+        createImagePreview(imageData, dataUrl, index) {
+            const imagePreview = document.getElementById('image-preview');
+            
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            previewItem.innerHTML = `
+                <img src="${dataUrl}" alt="${imageData.name}">
+                <div class="absolute top-2 right-2">
+                    <button type="button" class="remove-image bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600" data-index="${index}">
+                        ×
+                    </button>
+                </div>
+                <div class="p-2">
+                    <p class="text-xs text-gray-300 truncate">${imageData.name}</p>
+                    <p class="text-xs text-gray-400">${(imageData.size / 1024 / 1024).toFixed(2)} MB</p>
+                </div>
+            `;
+            
+            imagePreview.appendChild(previewItem);
+            
+            const removeBtn = previewItem.querySelector('.remove-image');
+            removeBtn.addEventListener('click', () => {
+                this.removeImage(index);
             });
+        }
 
-            // Mobile menu functionality
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            if (mobileMenuBtn) {
-                mobileMenuBtn.addEventListener('click', function() {
-                    alert('Mobile menu clicked!');
-                });
+        removeImage(index) {
+            this.collectedImages.splice(index, 1);
+            this.refreshImagePreview();
+            this.showNotification('Image removed successfully', 'success');
+        }
+
+        refreshImagePreview() {
+            const imagePreview = document.getElementById('image-preview');
+            imagePreview.innerHTML = '';
+            
+            if (this.collectedImages.length === 0) {
+                imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
+                return;
             }
+            
+            this.collectedImages.forEach((img, index) => {
+                this.createImagePreview(img, img.data, index);
+            });
+        }
+
+        resetForm() {
+            this.collectedImages = [];
+            this.uploadedFiles.clear();
+            
+            // Reset hidden inputs
+            document.getElementById('selected-controller').value = '';
+            document.getElementById('selected-service').value = '';
+            document.getElementById('selected-paint-color').value = '';
+            document.getElementById('selected-metallic-color').value = '';
+            
+            // Reset visual selections
+            document.querySelectorAll('.service-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelectorAll('.color-options-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            
+            this.refreshImagePreview();
+        }
+
+        showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${
+                type === 'success' ? 'bg-green-600' : 
+                type === 'error' ? 'bg-red-600' : 
+                'bg-blue-600'
+            }`;
+            notification.textContent = message;
+            notification.style.zIndex = '9999';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+    }
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Make page fade in immediately
+        document.body.classList.add('visible');
+        
+        // Initialize email handler
+        new EmailHandler();
+        
+        // Initialize form interactions
+        const selectedControllerInput = document.getElementById('selected-controller');
+        const selectedServiceInput = document.getElementById('selected-service');
+
+        // Controller selection handlers
+        document.querySelectorAll('.service-option[data-controller]').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.service-option[data-controller]').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                selectedControllerInput.value = this.dataset.controller;
+                console.log('Controller selected:', this.dataset.controller);
+            });
         });
+
+        // Service selection handlers
+        document.querySelectorAll('.service-option[data-service]').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.service-option[data-service]').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                selectedServiceInput.value = this.dataset.service;
+                console.log('Service selected:', this.dataset.service);
+
+                // Show/hide color options based on service
+                const paintingColors = document.getElementById('painting-colors');
+                const metallizingColors = document.getElementById('metallizing-colors');
+                
+                paintingColors.classList.remove('active');
+                metallizingColors.classList.remove('active');
+
+                if (this.dataset.service === 'custom-painting') {
+                    setTimeout(() => {
+                        paintingColors.classList.add('active');
+                    }, 100);
+                } else if (this.dataset.service === 'vacuum-metallizing') {
+                    setTimeout(() => {
+                        metallizingColors.classList.add('active');
+                    }, 100);
+                }
+            });
+        });
+
+        // Color selection handlers
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const container = this.closest('.color-options-container');
+                const options = container.querySelectorAll('.color-option');
+                
+                options.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                const color = this.getAttribute('data-color');
+                if (container.id === 'painting-colors') {
+                    document.getElementById('selected-paint-color').value = color;
+                    console.log('Paint color selected:', color);
+                } else if (container.id === 'metallizing-colors') {
+                    document.getElementById('selected-metallic-color').value = color;
+                    console.log('Metallic color selected:', color);
+                }
+            });
+        });
+
+        console.log('Inquiry form initialized successfully!');
+    });
     </script>
 </body>
 </html>

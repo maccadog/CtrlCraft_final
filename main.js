@@ -1,4 +1,4 @@
-// CtrlCraft Main JavaScript - Enhanced Version with Dust Animation & Modern Effects
+// CtrlCraft Main JavaScript - Fixed Version for Inquiry Page Compatibility
 // Using CDN versions of libraries instead of ES6 imports
 
 class CtrlCraftApp {
@@ -13,9 +13,9 @@ class CtrlCraftApp {
         this.initCarousels();
         this.createParticleEffect();
         this.initDustAnimation();
-        this.initModernAnimations(); // Add new modern animations
-        this.initScrollEffects(); // Add scroll-based animations
-        this.initInteractiveEffects(); // Add hover and interactive effects
+        this.initModernAnimations();
+        this.initScrollEffects();
+        this.initInteractiveEffects();
     }
 
     setupEventListeners() {
@@ -69,9 +69,6 @@ class CtrlCraftApp {
         setTimeout(() => {
             this.animateServiceCards();
         }, 1000);
-
-        // Auto-trigger scroll reveal animations for inquiry page
-        // REMOVED: No auto-scrolling to allow natural user interaction
     }
 
     typewriterEffect(element, text, speed = 50) {
@@ -98,25 +95,11 @@ class CtrlCraftApp {
                 targets: '.service-card',
                 opacity: [0, 1],
                 translateY: [50, 0],
-                easing: 'easeOutExpo',
-                delay: anime.stagger(150),
-                duration: 800
-            });
-        } else {
-            cards.forEach((card, index) => {
-                setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 150);
+                delay: anime.stagger(200),
+                duration: 800,
+                easing: 'easeOutQuart'
             });
         }
-    }
-
-    triggerScrollAnimations() {
-        const elements = document.querySelectorAll('.scroll-reveal');
-        elements.forEach(element => {
-            element.classList.add('active');
-        });
     }
 
     handleScrollAnimations() {
@@ -141,20 +124,27 @@ class CtrlCraftApp {
     }
 
     setupFormHandlers() {
-    // Service selection ONLY – leave controller cards alone
+        // FIXED: Only set up form handlers if we're NOT on the inquiry page
+        // This prevents conflicts with the inquiry page's own form handling
+        if (window.location.pathname.includes('inquiry.html')) {
+            console.log('On inquiry page - skipping main.js form handlers');
+            return;
+        }
+
+        // Service selection for non-inquiry pages
         const serviceOptions = document.querySelectorAll('.service-option[data-service]');
         const selectedServiceInput = document.getElementById('selected-service');
 
         serviceOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            serviceOptions.forEach(opt => opt.classList.remove('selected'));
-            option.classList.add('selected');
+            option.addEventListener('click', () => {
+                serviceOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
 
-            if (selectedServiceInput) {
-                selectedServiceInput.value = option.dataset.service;
-            }
+                if (selectedServiceInput) {
+                    selectedServiceInput.value = option.dataset.service;
+                }
+            });
         });
-    });
     }
 
     initCarousels() {
@@ -225,33 +215,32 @@ class CtrlCraftApp {
                 this.vx = (Math.random() - 0.5) * 0.5;
                 this.vy = (Math.random() - 0.5) * 0.5;
                 this.size = Math.random() * 2 + 1;
-                this.opacity = Math.random() * 0.5 + 0.2;
-                this.pulse = Math.random() * Math.PI * 2;
+                this.opacity = Math.random() * 0.5 + 0.1;
             }
 
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                this.pulse += 0.02;
 
                 if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
                 if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
             }
 
             draw() {
-                const currentOpacity = this.opacity + Math.sin(this.pulse) * 0.1;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(20, 184, 166, ${Math.max(0.1, currentOpacity)})`;
+                ctx.fillStyle = `rgba(20, 184, 166, ${this.opacity})`;
                 ctx.fill();
             }
         }
 
-        for (let i = 0; i < 50; i++) {
-            particles.push(new Particle());
+        function createParticles() {
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle());
+            }
         }
 
-        const animate = () => {
+        function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             particles.forEach(particle => {
@@ -260,217 +249,80 @@ class CtrlCraftApp {
             });
             
             animationId = requestAnimationFrame(animate);
+        }
+
+        createParticles();
+        animate();
+    }
+
+    initModernAnimations() {
+        // Add modern animation effects
+        if (typeof anime !== 'undefined') {
+            // Floating animation for elements
+            anime({
+                targets: '.float-element',
+                translateY: [-10, 10],
+                duration: 3000,
+                loop: true,
+                direction: 'alternate',
+                easing: 'easeInOutSine'
+            });
+        }
+    }
+
+    initScrollEffects() {
+        // Enhanced scroll-based animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
         };
 
-        animate();
-
-        window.addEventListener('beforeunload', () => {
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-            }
-        });
-    }
-
-    // Modern Animations System
-    initModernAnimations() {
-        this.initGradientBackground();
-        this.initFloatingElements();
-        this.initTextEffects();
-        this.initButtonAnimations();
-    }
-
-    // Animated gradient background
-    initGradientBackground() {
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes gradientShift {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-            }
-            
-            .animated-gradient {
-                background: linear-gradient(-45deg, #0a0a0a, #1a1a1a, #2d2d2d, #1a1a1a);
-                background-size: 400% 400%;
-                animation: gradientShift 15s ease infinite;
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Apply to body
-        document.body.classList.add('animated-gradient');
-    }
-
-    // Floating elements animation
-    initFloatingElements() {
-        const floatingElements = document.querySelectorAll('.service-card, .form-container');
-        
-        floatingElements.forEach((element, index) => {
-            element.style.animationDelay = `${index * 0.2}s`;
-            element.classList.add('floating-element');
-        });
-
-        const floatStyle = document.createElement('style');
-        floatStyle.textContent = `
-            @keyframes subtleFloat {
-                0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(-10px); }
-            }
-            
-            .floating-element {
-                animation: subtleFloat 6s ease-in-out infinite;
-            }
-        `;
-        document.head.appendChild(floatStyle);
-    }
-
-    // Text effects
-    initTextEffects() {
-        const headings = document.querySelectorAll('h1, h2, h3');
-        
-        headings.forEach(heading => {
-            heading.addEventListener('mouseenter', () => {
-                heading.style.transform = 'scale(1.05)';
-                heading.style.transition = 'transform 0.3s ease';
-            });
-            
-            heading.addEventListener('mouseleave', () => {
-                heading.style.transform = 'scale(1)';
-            });
-        });
-    }
-
-    // Button animations
-    initButtonAnimations() {
-        const buttons = document.querySelectorAll('button, .btn');
-        
-        buttons.forEach(button => {
-            button.addEventListener('mouseenter', () => {
-                button.style.transform = 'translateY(-2px)';
-                button.style.boxShadow = '0 10px 25px rgba(20, 184, 166, 0.3)';
-                button.style.transition = 'all 0.3s ease';
-            });
-            
-            button.addEventListener('mouseleave', () => {
-                button.style.transform = 'translateY(0)';
-                button.style.boxShadow = 'none';
-            });
-        });
-    }
-
-    // Scroll-based animations
-    initScrollEffects() {
-        const parallaxElements = document.querySelectorAll('.parallax');
-        
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            
-            parallaxElements.forEach(element => {
-                const rate = scrolled * -0.5;
-                element.style.transform = `translateY(${rate}px)`;
-            });
-        });
-    }
-
-    // Interactive effects
-    initInteractiveEffects() {
-        this.initHoverEffects();
-        this.initClickEffects();
-        this.initFocusEffects();
-    }
-
-    initHoverEffects() {
-        const cards = document.querySelectorAll('.service-card, .portfolio-item');
-        
-        cards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-5px) scale(1.02)';
-                card.style.boxShadow = '0 15px 35px rgba(20, 184, 166, 0.2)';
-                card.style.transition = 'all 0.3s ease';
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0) scale(1)';
-                card.style.boxShadow = 'none';
-            });
-        });
-    }
-
-    initClickEffects() {
-        document.addEventListener('click', (e) => {
-            if (e.target.matches('button, .btn, .service-option')) {
-                this.createRippleEffect(e);
-            }
-        });
-    }
-
-    createRippleEffect(e) {
-        const button = e.target;
-        const ripple = document.createElement('span');
-        const rect = button.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-        
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        ripple.classList.add('ripple');
-        
-        button.appendChild(ripple);
-        
-        setTimeout(() => {
-            ripple.remove();
-        }, 600);
-    }
-
-    initFocusEffects() {
-        const inputs = document.querySelectorAll('input, textarea, select');
-        
-        inputs.forEach(input => {
-            input.addEventListener('focus', () => {
-                input.style.transform = 'scale(1.02)';
-                input.style.transition = 'transform 0.2s ease';
-            });
-            
-            input.addEventListener('blur', () => {
-                input.style.transform = 'scale(1)';
-            });
-        });
-    }
-
-    showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
-            type === 'success' ? 'bg-green-600' : 
-            type === 'error' ? 'bg-red-600' : 'bg-blue-600'
-        } text-white`;
-        notification.textContent = message;
-        notification.style.transform = 'translateX(100%)';
-        notification.style.opacity = '0';
-        notification.style.transition = 'all 0.3s ease';
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.transform = 'translateX(0)';
-            notification.style.opacity = '1';
-        }, 100);
-        
-        setTimeout(() => {
-            notification.style.transform = 'translateX(100%)';
-            notification.style.opacity = '0';
-            setTimeout(() => {
-                if (document.body.contains(notification)) {
-                    document.body.removeChild(notification);
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
                 }
-            }, 300);
-        }, 5000);
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+            observer.observe(el);
+        });
+    }
+
+    initInteractiveEffects() {
+        // Add hover effects and interactive animations
+        document.querySelectorAll('.hover-lift').forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                if (typeof anime !== 'undefined') {
+                    anime({
+                        targets: element,
+                        translateY: -5,
+                        scale: 1.02,
+                        duration: 300,
+                        easing: 'easeOutQuart'
+                    });
+                }
+            });
+
+            element.addEventListener('mouseleave', () => {
+                if (typeof anime !== 'undefined') {
+                    anime({
+                        targets: element,
+                        translateY: 0,
+                        scale: 1,
+                        duration: 300,
+                        easing: 'easeOutQuart'
+                    });
+                }
+            });
+        });
     }
 }
 
-// Initialize the app when the page loads
+// Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('CtrlCraft App initializing...');
     new CtrlCraftApp();
 });
 
@@ -478,44 +330,17 @@ document.addEventListener('DOMContentLoaded', () => {
 const style = document.createElement('style');
 style.textContent = `
     @keyframes float {
-        0%, 100% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(180deg); }
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
     }
     
-    @keyframes ripple {
-        0% {
-            transform: scale(0);
-            opacity: 1;
-        }
-        100% {
-            transform: scale(4);
-            opacity: 0;
-        }
+    @keyframes glow {
+        0%, 100% { box-shadow: 0 0 5px rgba(20, 184, 166, 0.5); }
+        50% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.8); }
     }
     
-    .ripple {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.6);
-        transform: scale(0);
-        animation: ripple 0.6s linear;
-        pointer-events: none;
-    }
-    
-    .drag-over {
-        border-color: #14b8a6 !important;
-        background: rgba(20, 184, 166, 0.1) !important;
-        transform: scale(1.02);
+    .glow-effect {
+        animation: glow 2s ease-in-out infinite;
     }
 `;
 document.head.appendChild(style);
-
-// Global function for backward compatibility
-function checkEmptyPreview() {
-    const imagePreview = document.getElementById('image-preview');
-    if (emailHandler && emailHandler.refreshImagePreview) {
-        emailHandler.refreshImagePreview();
-    } else if (imagePreview && imagePreview.children.length === 0) {
-        imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
-    }
-}

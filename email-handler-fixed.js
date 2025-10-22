@@ -1,227 +1,29 @@
-// Email Handler for CtrlCraft - Enhanced Version with Image Support
-// This solution requires no server, database, or Firebase
-
+// Email Handler for CtrlCraft - FIXED VERSION with Correct Field Mapping
 class EmailHandler {
     constructor() {
         // EmailJS Configuration
-        // You'll need to sign up at https://www.emailjs.com and get these values
-        this.SERVICE_ID = 'service_vh27g2b'; // Replace with your EmailJS service ID
-        this.TEMPLATE_ID = 'template_a957hvd'; // Replace with your EmailJS template ID
-        this.PUBLIC_KEY = 'S0zUDXqxW2Kw0getx'; // Replace with your EmailJS public key
+        this.SERVICE_ID = 'service_vh27g2b';
+        this.TEMPLATE_ID = 'template_a957hvd';
+        this.PUBLIC_KEY = 'S0zUDXqxW2Kw0getx';
         
-        // Image collection array - now supports multiple images better
         this.collectedImages = [];
         this.emailjsLoaded = false;
-        this.uploadedFiles = new Set(); // Track uploaded files to prevent duplicates
-        this.isUploading = false; // Prevent multiple uploads
-        this.maxImages = 10; // Maximum number of images allowed
-        this.maxFileSize = 10 * 1024 * 1024; // 10MB max file size
+        this.uploadedFiles = new Set();
+        this.isUploading = false;
+        this.maxImages = 10;
+        this.maxFileSize = 10 * 1024 * 1024;
         
         this.init();
     }
 
     init() {
-        // Load EmailJS SDK
         this.loadEmailJS();
-        
-        // Setup form handlers
         this.setupFormHandlers();
         this.setupImageCollection();
-        this.setupDragAndDrop(); // Add drag and drop support
-    }
-
-    setupImageCollection() {
-        // Handle file uploads and store image data
-        const fileInput = document.getElementById('inspiration-upload');
-        if (fileInput) {
-            fileInput.addEventListener('change', (e) => {
-                this.handleFileUpload(e.target.files);
-            });
-        }
-    }
-
-    setupDragAndDrop() {
-        const uploadArea = document.querySelector('.file-upload');
-        if (!uploadArea) return;
-
-        // Prevent default drag behaviors
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, this.preventDefaults, false);
-            document.body.addEventListener(eventName, this.preventDefaults, false);
-        });
-
-        // Highlight drop area when item is dragged over it
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('drag-over'), false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('drag-over'), false);
-        });
-
-        // Handle dropped files
-        uploadArea.addEventListener('drop', (e) => {
-            const files = e.dataTransfer.files;
-            this.handleFileUpload(files);
-        }, false);
-    }
-
-    preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    handleFileUpload(files) {
-        // Prevent multiple simultaneous uploads
-        if (this.isUploading) {
-            console.log('Upload already in progress, skipping...');
-            return;
-        }
-        
-        this.isUploading = true;
-        const imagePreview = document.getElementById('image-preview');
-        if (!imagePreview) {
-            this.isUploading = false;
-            return;
-        }
-
-        // Convert FileList to Array for easier handling
-        const fileArray = Array.from(files);
-        
-        // Filter for image files only
-        const imageFiles = fileArray.filter(file => file.type.startsWith('image/'));
-        
-        if (imageFiles.length === 0) {
-            this.showNotification('Please select valid image files.', 'error');
-            this.isUploading = false;
-            return;
-        }
-
-        // Check total image limit
-        const totalImages = this.collectedImages.length + imageFiles.length;
-        if (totalImages > this.maxImages) {
-            this.showNotification(`Maximum ${this.maxImages} images allowed. You have ${this.collectedImages.length} already uploaded.`, 'error');
-            this.isUploading = false;
-            return;
-        }
-
-        // Clear "no files selected" message if this is the first upload
-        if (this.collectedImages.length === 0) {
-            imagePreview.innerHTML = '';
-        }
-
-        // Process each file
-        let processedCount = 0;
-        let errorCount = 0;
-
-        imageFiles.forEach((file, index) => {
-            // Check file size
-            if (file.size > this.maxFileSize) {
-                this.showNotification(`File ${file.name} is too large. Maximum size is 10MB.`, 'error');
-                errorCount++;
-                processedCount++;
-                return;
-            }
-
-            const fileKey = `${file.name}-${file.size}`;
-            
-            // Skip if this file is already processed
-            if (this.uploadedFiles.has(fileKey)) {
-                console.log('Skipping duplicate file:', file.name);
-                processedCount++;
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                // Store image data
-                const imageData = {
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    data: e.target.result
-                };
-                
-                this.collectedImages.push(imageData);
-                this.uploadedFiles.add(fileKey);
-                
-                // Create image preview
-                this.createImagePreview(file, e.target.result, this.collectedImages.length - 1);
-                
-                processedCount++;
-                
-                // Check if all files are processed
-                if (processedCount === imageFiles.length) {
-                    this.isUploading = false;
-                    if (errorCount === 0) {
-                        this.showNotification(`${imageFiles.length} image(s) uploaded successfully!`, 'success');
-                    }
-                }
-            };
-            
-            reader.onerror = () => {
-                this.showNotification(`Failed to read file: ${file.name}`, 'error');
-                processedCount++;
-                errorCount++;
-                if (processedCount === imageFiles.length) {
-                    this.isUploading = false;
-                }
-            };
-            
-            reader.readAsDataURL(file);
-        });
-    }
-
-    createImagePreview(file, imageData, index) {
-        const imagePreview = document.getElementById('image-preview');
-        
-        const previewItem = document.createElement('div');
-        previewItem.className = 'preview-item';
-        previewItem.innerHTML = `
-            <img src="${imageData}" alt="${file.name}" loading="lazy">
-            <div class="file-info">
-                <div class="text-white text-xs truncate">${file.name}</div>
-                <div class="text-gray-400 text-xs">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
-            </div>
-            <button type="button" class="remove-btn" onclick="emailHandler.removeImage(${index})">×</button>
-        `;
-        
-        imagePreview.appendChild(previewItem);
-    }
-
-    removeImage(index) {
-        // Remove from collected images
-        if (index >= 0 && index < this.collectedImages.length) {
-            const removedImage = this.collectedImages[index];
-            this.collectedImages.splice(index, 1);
-            
-            // Remove from uploaded files tracking
-            const fileKey = `${removedImage.name}-${removedImage.size}`;
-            this.uploadedFiles.delete(fileKey);
-            
-            // Refresh the preview
-            this.refreshImagePreview();
-            
-            this.showNotification('Image removed successfully', 'success');
-        }
-    }
-
-    refreshImagePreview() {
-        const imagePreview = document.getElementById('image-preview');
-        imagePreview.innerHTML = '';
-        
-        if (this.collectedImages.length === 0) {
-            imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
-            return;
-        }
-        
-        this.collectedImages.forEach((img, index) => {
-            this.createImagePreview(img, img.data, index);
-        });
+        this.setupDragAndDrop();
     }
 
     loadEmailJS() {
-        // Check if EmailJS is already loaded
         if (typeof emailjs !== 'undefined') {
             this.emailjsLoaded = true;
             emailjs.init(this.PUBLIC_KEY);
@@ -229,9 +31,8 @@ class EmailHandler {
             return;
         }
 
-        // Add EmailJS script to head
         const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+        script.src = 'https://cdn.emailjs.com/sdk/v3/email.min.js';
         script.onload = () => {
             if (typeof emailjs !== 'undefined') {
                 emailjs.init(this.PUBLIC_KEY);
@@ -274,15 +75,42 @@ class EmailHandler {
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
             
-            console.log('Form data:', data);
+            console.log('Form data collected:', data);
             
-            if (!data.name || !data.email || !data.message || !data['shipping-confirm']) {
-                throw new Error('Please fill in all required fields and confirm shipping requirements');
+            // FIXED: Correct field name validation - matches your actual form fields
+            if (!data.first_name || !data.last_name || !data.email || !data.design_description || 
+                !data.controller_type || !data.service_type || !data.shipping_requirement) {
+                let missingFields = [];
+                if (!data.first_name) missingFields.push('First Name');
+                if (!data.last_name) missingFields.push('Last Name');
+                if (!data.email) missingFields.push('Email');
+                if (!data.design_description) missingFields.push('Design Description');
+                if (!data.controller_type) missingFields.push('Controller Type');
+                if (!data.service_type) missingFields.push('Service Type');
+                if (!data.shipping_requirement) missingFields.push('Shipping Agreement');
+                
+                throw new Error(`Please complete: ${missingFields.join(', ')}`);
             }
             
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(data.email)) {
                 throw new Error('Please enter a valid email address');
+            }
+            
+            // Prepare color information
+            let colorInfo = 'No specific color selected';
+            if (data.selected_paint_color) {
+                colorInfo = `Paint Color: ${data.selected_paint_color}`;
+                if (data.custom_paint_color) {
+                    colorInfo += ` (${data.custom_paint_color})`;
+                }
+            } else if (data.selected_metallic_color) {
+                colorInfo = `Metallic Finish: ${data.selected_metallic_color}`;
+                if (data.custom_metallic_color) {
+                    colorInfo += ` (${data.custom_metallic_color})`;
+                }
+            } else if (data.custom_paint_color || data.custom_metallic_color) {
+                colorInfo = `Custom: ${data.custom_paint_color || data.custom_metallic_color}`;
             }
             
             // Prepare image data
@@ -309,29 +137,28 @@ class EmailHandler {
             
             const emailParams = {
                 to_email: 'mackenzie5688@gmail.com',
-                from_name: data.name.trim(),
+                from_name: `${data.first_name} ${data.last_name}`.trim(),
                 from_email: data.email.trim(),
                 phone: data.phone || 'Not provided',
-                service_type: data.service || 'Not specified',
-                controller_type: data['controller-type'] || 'Not specified',
-                timeline: data.timeline || 'Not specified',
-                message: data.message.trim(),
+                service_type: data.service_type,
+                controller_type: data.controller_type,
+                timeline: data.timeline,
+                color_choice: colorInfo,
+                message: data.design_description.trim(),
+                additional_notes: data.additional_notes || 'None',
                 image_html: imageHtml.trim(),
                 image_text: imageText.trim(),
                 image_count: this.collectedImages.length.toString(),
                 reply_to: data.email.trim()
             };
             
-            console.log('Email params:', emailParams);
-            console.log('Images collected:', this.collectedImages.length);
+            console.log('Sending email with params:', emailParams);
             
             const response = await emailjs.send(
                 this.SERVICE_ID,
                 this.TEMPLATE_ID,
                 emailParams
             );
-            
-            console.log('EmailJS response:', response);
             
             if (response.status === 200 || response.text === 'OK') {
                 this.showNotification('Inquiry sent successfully! I\'ll contact you soon.', 'success');
@@ -354,62 +181,189 @@ class EmailHandler {
         }
     }
 
+    setupImageCollection() {
+        const fileInput = document.getElementById('inspiration-upload');
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                this.handleFileUpload(e.target.files);
+            });
+        }
+    }
+
+    setupDragAndDrop() {
+        const uploadArea = document.querySelector('.file-upload');
+        if (!uploadArea) return;
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, this.preventDefaults, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('drag-over'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('drag-over'), false);
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            this.handleFileUpload(files);
+        }, false);
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => {
+            document.getElementById('inspiration-upload').click();
+        });
+    }
+
+    preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    handleFileUpload(files) {
+        if (this.isUploading) {
+            console.log('Upload already in progress, skipping...');
+            return;
+        }
+        
+        this.isUploading = true;
+        const imagePreview = document.getElementById('image-preview');
+        if (!imagePreview) {
+            this.isUploading = false;
+            return;
+        }
+
+        const fileArray = Array.from(files);
+        const imageFiles = fileArray.filter(file => file.type.startsWith('image/'));
+        
+        if (imageFiles.length === 0) {
+            this.showNotification('Please select valid image files.', 'error');
+            this.isUploading = false;
+            return;
+        }
+
+        if (this.collectedImages.length + imageFiles.length > this.maxImages) {
+            this.showNotification(`Maximum ${this.maxImages} images allowed.`, 'error');
+            this.isUploading = false;
+            return;
+        }
+
+        imageFiles.forEach(file => {
+            if (file.size > this.maxFileSize) {
+                this.showNotification(`File ${file.name} is too large. Maximum 10MB allowed.`, 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageData = {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    data: e.target.result,
+                    lastModified: file.lastModified
+                };
+                
+                this.collectedImages.push(imageData);
+                this.createImagePreview(imageData, e.target.result, this.collectedImages.length - 1);
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        this.isUploading = false;
+    }
+
+    createImagePreview(imageData, dataUrl, index) {
+        const imagePreview = document.getElementById('image-preview');
+        
+        const previewItem = document.createElement('div');
+        previewItem.className = 'preview-item';
+        previewItem.innerHTML = `
+            <img src="${dataUrl}" alt="${imageData.name}">
+            <div class="absolute top-2 right-2">
+                <button type="button" class="remove-image bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600" data-index="${index}">
+                    ×
+                </button>
+            </div>
+            <div class="p-2">
+                <p class="text-xs text-gray-300 truncate">${imageData.name}</p>
+                <p class="text-xs text-gray-400">${(imageData.size / 1024 / 1024).toFixed(2)} MB</p>
+            </div>
+        `;
+        
+        imagePreview.appendChild(previewItem);
+        
+        const removeBtn = previewItem.querySelector('.remove-image');
+        removeBtn.addEventListener('click', () => {
+            this.removeImage(index);
+        });
+    }
+
+    removeImage(index) {
+        this.collectedImages.splice(index, 1);
+        this.refreshImagePreview();
+        this.showNotification('Image removed successfully', 'success');
+    }
+
+    refreshImagePreview() {
+        const imagePreview = document.getElementById('image-preview');
+        imagePreview.innerHTML = '';
+        
+        if (this.collectedImages.length === 0) {
+            imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
+            return;
+        }
+        
+        this.collectedImages.forEach((img, index) => {
+            this.createImagePreview(img, img.data, index);
+        });
+    }
+
     resetForm() {
         this.collectedImages = [];
         this.uploadedFiles.clear();
         
-        // Reset service selection
-        document.querySelectorAll('.service-option').forEach(card => {
-            card.classList.remove('selected');
+        // Reset hidden inputs
+        document.getElementById('selected-controller').value = '';
+        document.getElementById('selected-service').value = '';
+        document.getElementById('selected-paint-color').value = '';
+        document.getElementById('selected-metallic-color').value = '';
+        
+        // Reset visual selections
+        document.querySelectorAll('.service-option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        document.querySelectorAll('.color-option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        document.querySelectorAll('.color-options-container').forEach(container => {
+            container.classList.remove('active');
         });
         
-        // Reset image preview
-        const imagePreview = document.getElementById('image-preview');
-        if (imagePreview) {
-            imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
-        }
+        this.refreshImagePreview();
     }
 
     showNotification(message, type = 'info') {
         const notification = document.createElement('div');
-        notification.className = `fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+        notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${
             type === 'success' ? 'bg-green-600' : 
-            type === 'error' ? 'bg-red-600' : 'bg-blue-600'
-        } text-white`;
+            type === 'error' ? 'bg-red-600' : 
+            'bg-blue-600'
+        }`;
         notification.textContent = message;
-        notification.style.transform = 'translateX(100%)';
-        notification.style.opacity = '0';
-        notification.style.transition = 'all 0.3s ease';
+        notification.style.zIndex = '9999';
         
         document.body.appendChild(notification);
         
         setTimeout(() => {
-            notification.style.transform = 'translateX(0)';
-            notification.style.opacity = '1';
-        }, 100);
-        
-        setTimeout(() => {
-            notification.style.transform = 'translateX(100%)';
-            notification.style.opacity = '0';
-            setTimeout(() => {
-                if (document.body.contains(notification)) {
-                    document.body.removeChild(notification);
-                }
-            }, 300);
+            notification.remove();
         }, 5000);
     }
 }
 
-// Initialize the email handler when the page loads
-let emailHandler;
-document.addEventListener('DOMContentLoaded', () => {
-    emailHandler = new EmailHandler();
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    new EmailHandler();
 });
-
-// Global function for backward compatibility
-function checkEmptyPreview() {
-    const imagePreview = document.getElementById('image-preview');
-    if (imagePreview && imagePreview.children.length === 0) {
-        imagePreview.innerHTML = '<p class="text-gray-400 text-sm text-center">No files selected</p>';
-    }
-}
