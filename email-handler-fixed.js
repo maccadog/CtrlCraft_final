@@ -100,6 +100,9 @@ class EmailHandler {
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
         
+        if (submitBtn.dataset.sending === 'true') return;
+        submitBtn.dataset.sending = 'true';
+
         try {
             if (!this.emailjsLoaded || typeof emailjs === 'undefined') {
                 throw new Error('Email service is not ready. Please wait a moment and try again.');
@@ -228,6 +231,7 @@ class EmailHandler {
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
+            delete submitBtn.dataset.sending;
         }
     }
 
