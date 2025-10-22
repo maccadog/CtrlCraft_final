@@ -202,7 +202,7 @@
                     <div class="ml-10 flex items-baseline space-x-8">
                         <a href="index.html" class="text-gray-300 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">Home</a>
                         <a href="about.html" class="text-gray-300 hover:text-teal-300 px-3 py-2 text-sm font-medium transition-colors">About</a>
-                        <a href="inquiry-FINAL.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Inquiry</a>
+                        <a href="inquiry.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Inquiry</a>
                     </div>
                 </div>
                 <div class="md:hidden">
@@ -313,7 +313,7 @@
                         <input type="hidden" id="selected-service" name="service_type" required>
                     </div>
                     
-                     Color Options for Custom Painting
+                    <!-- Color Selection -->
                     <div id="painting-colors" class="color-options-container">
                         <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Paint Color (Optional)</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
@@ -367,7 +367,7 @@
                         <input type="hidden" id="selected-paint-color" name="selected_paint_color">
                     </div>
                 
-                    Metallic Color Options for Vacuum Metalizing
+                    
                     <div id="metallizing-colors" class="color-options-container">
                         <label class="block text-sm font-medium text-gray-300 mb-4">Choose Your Metallic Finish (Optional)</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
@@ -638,8 +638,8 @@
                     color_choice: colorInfo,
                     message: data.design_description.trim(),
                     additional_notes: data.additional_notes || 'None',
-                    image_html: imageHtml.trim(),
-                    image_text: imageText.trim(),
+                    image_html: imageHtml.trim() || 'No images uploaded',
+                    image_text: imageText.trim() || 'No images uploaded',
                     image_count: this.collectedImages.length.toString(),
                     reply_to: data.email.trim()
                 };
@@ -776,7 +776,7 @@
                 <img src="${dataUrl}" alt="${imageData.name}">
                 <div class="absolute top-2 right-2">
                     <button type="button" class="remove-image bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600" data-index="${index}">
-                        ×
+                        
                     </button>
                 </div>
                 <div class="p-2">
