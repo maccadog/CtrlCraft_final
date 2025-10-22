@@ -1,4 +1,4 @@
-// Email Handler for CtrlCraft - INTEGRATED VERSION with Enhanced Functionality
+// Email Handler for CtrlCraft - FIXED VERSION with Corruption Prevention
 class EmailHandler {
     constructor() {
         // EmailJS Configuration
@@ -10,7 +10,7 @@ class EmailHandler {
         this.emailjsLoaded = false;
         this.uploadedFiles = new Set();
         this.isUploading = false;
-        this.maxImages = 10;
+        this.maxImages = 5;
         this.maxFileSize = 10 * 1024 * 1024;
         
         this.init();
@@ -60,6 +60,42 @@ class EmailHandler {
         }
     }
 
+    // CRITICAL FIX: Sanitize input to prevent special character corruption
+    sanitizeInput(input) {
+        if (!input || typeof input !== 'string') return '';
+        
+        // Replace special characters that can break EmailJS templates
+        return input
+            .replace(/[<>]/g, '') // Remove angle brackets completely
+            .replace(/"/g, '&quot;') // Escape double quotes
+            .replace(/'/g, '&apos;') // Escape single quotes
+            .replace(/&/g, '&amp;') // Escape ampersands
+            .replace(/`/g, ''); // Remove backticks
+    }
+
+    // CRITICAL FIX: Ensure all variables have safe default values
+    sanitizeEmailParams(params) {
+        const sanitized = {};
+        
+        // Process each parameter with proper default values
+        sanitized.to_email = params.to_email || 'mackenzie5688@gmail.com';
+        sanitized.from_name = this.sanitizeInput(params.from_name) || 'Anonymous Customer';
+        sanitized.from_email = this.sanitizeInput(params.from_email) || 'no-reply@ctrlcraft.com';
+        sanitized.phone = this.sanitizeInput(params.phone) || 'Not provided';
+        sanitized.service_type = this.sanitizeInput(params.service_type) || 'Not specified';
+        sanitized.controller_type = this.sanitizeInput(params.controller_type) || 'Not specified';
+        sanitized.timeline = this.sanitizeInput(params.timeline) || 'Not specified';
+        sanitized.color_choice = this.sanitizeInput(params.color_choice) || 'No color selected';
+        sanitized.message = this.sanitizeInput(params.message) || 'No description provided';
+        sanitized.additional_notes = this.sanitizeInput(params.additional_notes) || 'None';
+        sanitized.image_html = params.image_html || '<p><strong>No images uploaded</strong></p>';
+        sanitized.image_text = params.image_text || 'No images uploaded';
+        sanitized.image_count = params.image_count || '0';
+        sanitized.reply_to = this.sanitizeInput(params.reply_to) || sanitized.from_email;
+        
+        return sanitized;
+    }
+
     async handleInquirySubmission(form) {
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
@@ -75,7 +111,7 @@ class EmailHandler {
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
             
-            console.log('Form data collected:', data);
+            console.log('Raw form data collected:', data);
             
             // FIXED: Correct field name validation - matches your actual form fields
             if (!data.first_name || !data.last_name || !data.email || !data.design_description || 
@@ -97,45 +133,56 @@ class EmailHandler {
                 throw new Error('Please enter a valid email address');
             }
             
-            // Prepare color information
+            // Prepare color information with corruption prevention
             let colorInfo = 'No specific color selected';
             if (data.selected_paint_color) {
-                colorInfo = `Paint Color: ${data.selected_paint_color}`;
+                colorInfo = `Paint Color: ${this.sanitizeInput(data.selected_paint_color)}`;
                 if (data.custom_paint_color) {
-                    colorInfo += ` (${data.custom_paint_color})`;
+                    colorInfo += ` (${this.sanitizeInput(data.custom_paint_color)})`;
                 }
             } else if (data.selected_metallic_color) {
-                colorInfo = `Metallic Finish: ${data.selected_metallic_color}`;
+                colorInfo = `Metallic Finish: ${this.sanitizeInput(data.selected_metallic_color)}`;
                 if (data.custom_metallic_color) {
-                    colorInfo += ` (${data.custom_metallic_color})`;
+                    colorInfo += ` (${this.sanitizeInput(data.custom_metallic_color)})`;
                 }
             } else if (data.custom_paint_color || data.custom_metallic_color) {
-                colorInfo = `Custom: ${data.custom_paint_color || data.custom_metallic_color}`;
+                colorInfo = `Custom: ${this.sanitizeInput(data.custom_paint_color || data.custom_metallic_color)}`;
             }
             
-            // Prepare image data
+            // CRITICAL FIX: Limit image data size to prevent EmailJS limits
             let imageHtml = '<p><strong>No images uploaded</strong></p>';
             let imageText = 'No images uploaded';
             
             if (this.collectedImages.length > 0) {
+                // Limit the number of images displayed to prevent email size issues
+                const displayImages = this.collectedImages.slice(0, 5); // Max 5 images in email
+                
                 imageHtml = '<div style="margin: 20px 0;"><h3>Reference Images:</h3>';
                 imageText = 'Reference Images:\n';
                 
-                this.collectedImages.forEach((img, index) => {
+                displayImages.forEach((img, index) => {
+                    // CRITICAL FIX: Use smaller image dimensions in email to reduce size
                     imageHtml += `
-                        <div style="display: inline-block; margin: 10px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
-                            <img src="${img.data}" alt="${img.name}" style="max-width: 200px; max-height: 200px; display: block; margin-bottom: 5px;">
-                            <p style="font-size: 12px; margin: 0; text-align: center;"><strong>Image ${index + 1}:</strong> ${img.name}</p>
-                            <p style="font-size: 11px; margin: 0; text-align: center; color: #666;">Size: ${(img.size / 1024 / 1024).toFixed(2)} MB</p>
+                        <div style="display: inline-block; margin: 10px; border: 1px solid #ddd; padding: 10px; border-radius: 5px; max-width: 150px;">
+                            <img src="${img.data}" alt="${this.sanitizeInput(img.name)}" style="max-width: 130px; max-height: 130px; display: block; margin-bottom: 5px;">
+                            <p style="font-size: 11px; margin: 0; text-align: center;"><strong>Image ${index + 1}:</strong> ${this.sanitizeInput(img.name)}</p>
+                            <p style="font-size: 10px; margin: 0; text-align: center; color: #666;">Size: ${(img.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
                     `;
                     imageText += `Image ${index + 1}: ${img.name} (${(img.size / 1024 / 1024).toFixed(2)} MB)\n`;
                 });
                 
+                // Add note if there are more images than shown
+                if (this.collectedImages.length > 5) {
+                    imageHtml += `<p style="font-size: 12px; color: #666; margin-top: 10px;"><em>+ ${this.collectedImages.length - 5} additional images not shown in email</em></p>`;
+                    imageText += `\n+ ${this.collectedImages.length - 5} additional images`;
+                }
+                
                 imageHtml += '</div>';
             }
             
-            const emailParams = {
+            // CRITICAL FIX: Build email params with proper sanitization
+            const rawParams = {
                 to_email: 'mackenzie5688@gmail.com',
                 from_name: `${data.first_name} ${data.last_name}`.trim(),
                 from_email: data.email.trim(),
@@ -152,7 +199,10 @@ class EmailHandler {
                 reply_to: data.email.trim()
             };
             
-            console.log('Sending email with params:', emailParams);
+            // CRITICAL FIX: Sanitize all parameters before sending
+            const emailParams = this.sanitizeEmailParams(rawParams);
+            
+            console.log('Sending email with sanitized params:', emailParams);
             
             const response = await emailjs.send(
                 this.SERVICE_ID,
@@ -281,14 +331,14 @@ class EmailHandler {
         const previewItem = document.createElement('div');
         previewItem.className = 'preview-item';
         previewItem.innerHTML = `
-            <img src="${dataUrl}" alt="${imageData.name}">
+            <img src="${dataUrl}" alt="${this.sanitizeInput(imageData.name)}">
             <div class="absolute top-2 right-2">
                 <button type="button" class="remove-image bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600" data-index="${index}">
                     ×
                 </button>
             </div>
             <div class="p-2">
-                <p class="text-xs text-gray-300 truncate">${imageData.name}</p>
+                <p class="text-xs text-gray-300 truncate">${this.sanitizeInput(imageData.name)}</p>
                 <p class="text-xs text-gray-400">${(imageData.size / 1024 / 1024).toFixed(2)} MB</p>
             </div>
         `;
