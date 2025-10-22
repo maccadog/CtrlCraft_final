@@ -183,7 +183,7 @@ class EmailHandler {
             
             // CRITICAL FIX: Build email params with proper sanitization
             const rawParams = {
-                to_email: '',
+                to_email: 'mackenzie5688@gmail.com',
                 from_name: `${data.first_name} ${data.last_name}`.trim(),
                 from_email: data.email.trim(),
                 phone: data.phone || 'Not provided',
